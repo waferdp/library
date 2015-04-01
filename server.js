@@ -11,7 +11,7 @@ app.use(bodyParser()); 						// pull information from html in POST
 app.use(methodOverride()); 					// simulate DELETE and PUT
 
 
-mongoose.connect("mongodb://localhost/library");
+mongoose.connect("mongodb://192.168.1.18/library");
 var db = mongoose.connection;
 
 
@@ -25,7 +25,7 @@ var BookSchema = new mongoose.Schema({
     collection: 'books'
 });
 
-var BookModel = mongoose.model('book',BookSchema);
+var BookModel = mongoose.model('book', BookSchema);
 
 app.get('/api/library', function(req, res) {
     if(db != null)
