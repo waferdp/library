@@ -62,10 +62,12 @@
 	      <input type="text" name="bookAuthor" id="bookAuthor" class="form-control" ng-model="bookCtrl.book.author" required />
 	    </div>
 	    <div class="form-group">
-	      <label for="bookCover" style="flex:1;flex-flow:column nowrap;">Cover</label>  
-	      <input type="file" accept="image/*" name="bookCover" id="bookCover" class="form-control" style="flex:1;flex-flow:column nowrap;" /> 
-	      <label for="bookDate"  style="flex:1;flex-flow:column nowrap;">Added date:</label>
-	      <input type="date" name="bookDate" id="bookDate" class="form-control" ng-model="bookCtrl.book.date"  style="flex:1;flex-flow:column nowrap;" />
+	      <label for="bookCover">Cover</label>  
+	      <input type="file" accept="image/*" name="bookCover" id="bookCover" class="form-control"/> 
+	    </div>
+	    <div class="form-group">
+	      <label for="bookDate">Date added:</label>
+	      <input type="date" name="bookDate" id="bookDate" class="form-control" ng-model="bookCtrl.book.date"/>
 	    </div>
 	    <div class="form-group">
 	      <label for="bookISBN">ISBN:</label>

@@ -2,10 +2,6 @@ var express        = require('express');
 var morgan         = require('morgan');
 var bodyParser     = require('body-parser');
 var methodOverride = require('method-override');
-var MongoDb        = require('mongodb');
-var MongoClient    = MongoDb.MongoClient;
-var ObjectID	   = MongoDb.ObjectID;
-
 var mongoose       = require('mongoose');
 var app            = express();
 
@@ -14,41 +10,40 @@ app.use(morgan('dev')); 					// log every request to the console
 app.use(bodyParser()); 						// pull information from html in POST
 app.use(methodOverride()); 					// simulate DELETE and PUT
 
-var db = {};
 
 mongoose.connect("mongodb://localhost/library");
+var db = mongoose.connection;
+
 
 var BookSchema = new mongoose.Schema({  
-    title: String,  
-    author: String,  
+    title: { type: String, required: true },
+    author: { type: String, required: true},
     isbn: String,
+    cover: { meta: String, data: String},
     date: Date 
 },{
     collection: 'books'
 });
 
-var BookModel = new mongoose.model('book',BookSchema);
-
-
-
-//MongoClient.connect("mongodb://localhost:27017/library", function(err, successDb) {
-//    db = successDb;
-//});
+var BookModel = mongoose.model('book',BookSchema);
 
 app.get('/api/library', function(req, res) {
     if(db != null)
     {
-	db.collection('books', function(err, collection) {
-	    var allBooks = collection.find().toArray(function(err, items) {
-		res.send(JSON.stringify(items));
-	    });
+	BookModel.find(function(err, books) {
+	    if(!err) {
+		res.send(JSON.stringify(books));
+	    }
+	    else {
+		console.log("Error listing books: " + err);
+	    }
 	});
-    }	
+
+   }	
 });
 
 app.post('/api/library', function(req,res) {
 
-    console.log(req.body);
     var book = new BookModel(req.body);
     book.save(function(err){
 	if(err)
@@ -60,14 +55,6 @@ app.post('/api/library', function(req,res) {
 	    res.send(book._id);
 	}
     });
-    if(db != null)
-    {
-	db.collection('books', function(err, collection) {
-	    collection.insert(req.body);
-	    console.log(req.body._id);
-	    res.send(req.body._id);
-	});
-    }
 });
 
 app.delete('/api/library/:id', function(req,res){
@@ -76,12 +63,20 @@ app.delete('/api/library/:id', function(req,res){
     
     if(db != null)
     {
-	db.collection('books', function(err, collection) {
-	    collection.remove(query, {justOne : false}, function(err, itemsRemoved) {
-	    });
+	BookModel.findById(req.params.id, function(err, book) {
+	    if(!err) {
+		book.remove(function(err) {
+		    if(err) {
+			console.log("Error when removing book " + book.title + ": " + err);
+		    }
+		});
+	    }
+	    else {
+		console.log("Error finding book " + req.params.id + ": " + err);
+	    }
 	});
     }
 });
 
 app.listen(8000);	
-console.log('Simple static server listening on port 8000'); 
+console.log('Library server listening on port 8000'); 
