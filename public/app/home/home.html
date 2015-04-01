@@ -1,4 +1,65 @@
 <div class="jumbotron text-center ng-scope">
-<h1>Home Page</h1>
-<p>{{message}}</p>
+    <h1>Library User Interface</h1>
+    <p>{{message}}</p>
+</div>
+
+
+<div ng-controller="libraryController as library">
+    <ul class="list-group">
+        <li class="list-group-item" ng-repeat="book in library.books">
+            <div style="margin-left:100px">
+                <div style="float:right;width:100%;">
+                    Title: {{book.title}}
+                    <button style="position:absolute; left:400px;" ng-click="library.removeBook(book)">-</button><br />
+                    Author: {{book.author}}<br />
+                    ISBN: {{book.isbn}}<br />
+                </div>
+                <div style="float:left;width:100px;margin-left:-100px;">
+                    <img height="100px" alt="star" ng-src="{{book.cover.meta}}{{book.cover.data}}" />
+                </div>
+                <div style="clear:both">
+                </div>
+            </div>
+        </li>
+    </ul>
+    <div id="bookFormContainer" style="width:50%; border: solid; padding:20px;">
+        <form name="bookForm" ng-controller="bookController as bookCtrl" ng-submit="bookForm.$valid && bookCtrl.addBook(library)">
+            <fieldset>
+                <div style="margin-left:100px">
+                    <div style="float:right;width:100%;">
+                        Title: {{bookCtrl.book.title}}
+                        Author: {{bookCtrl.book.author}}<br />
+                        ISBN: {{bookCtrl.book.isbn}}<br />
+                    </div>
+                    <div style="float:left;width:100px;margin-left:-100px;">
+                        <img height="100" alt="star" ng-src="{{bookCtrl.book.cover.meta}}{{bookCtrl.book.cover.data}}" />
+                    </div>
+                    <div style="clear:both">
+                    </div>
+                </div>
+                <legend>Add a book</legend>
+                <div class="form-group">
+                    <label for="bookTitle">Title:</label>
+                    <input type="text" name="bookTitle" id="bookTitle" class="form-control" ng-model="bookCtrl.book.title" required />
+                </div>
+                <div class="form-group">
+                    <label for="bookAuthor">Author:</label>
+                    <input type="text" name="bookAuthor" id="bookAuthor" class="form-control" ng-model="bookCtrl.book.author" required />
+                </div>
+                <div class="form-group">
+                    <label for="bookCover">Cover</label>
+                    <input type="file" accept="image/*" name="bookCover" id="bookCover" class="form-control" />
+                </div>
+                <div class="form-group">
+                    <label for="bookDate">Date added:</label>
+                    <input type="date" name="bookDate" id="bookDate" class="form-control" ng-model="bookCtrl.book.date" />
+                </div>
+                <div class="form-group">
+                    <label for="bookISBN">ISBN:</label>
+                    <input type="text" name="bookISBN" id="bookISBN" class="form-control" ng-model="bookCtrl.book.isbn" />
+                </div>
+                <input type="submit" name="bookSubmit" id="bookSubmit" class="btn btn-default" value="Submit" />
+            </fieldset>
+        </form>
+    </div>
 </div>
