@@ -59,8 +59,6 @@ app.post('/api/library', function(req,res) {
 
 app.delete('/api/library/:id', function(req,res){
 
-    var query = {"_id" : new ObjectID(req.params.id)};
-    
     if(db != null)
     {
 	BookModel.findById(req.params.id, function(err, book) {
