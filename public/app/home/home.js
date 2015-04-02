@@ -41,7 +41,7 @@ libraryApp.controller('bookController', ['$http', '$scope', function ($http, $sc
         });
     };
 
-    handleFileSelect = function (event) {
+    $scope.handleFileSelect = function (event) {
         var files = event.target.files;
         var file = files[0];
         if (files && file) {
@@ -56,8 +56,5 @@ libraryApp.controller('bookController', ['$http', '$scope', function ($http, $sc
             reader.readAsBinaryString(file);
         }
     };
-}]);
 
-window.addEventListener('load', function (event) {
-    document.getElementById('bookCover').addEventListener('change', handleFileSelect, false);
-}, false);
+}]);

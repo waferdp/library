@@ -3,7 +3,6 @@
     <p>{{message}}</p>
 </div>
 
-
 <div ng-controller="libraryController as library">
     <ul class="list-group">
         <li class="list-group-item" ng-repeat="book in library.books">
@@ -15,7 +14,7 @@
                     ISBN: {{book.isbn}}<br />
                 </div>
                 <div style="float:left;width:100px;margin-left:-100px;">
-                    <img height="100px" alt="star" ng-src="{{book.cover.meta}}{{book.cover.data}}" />
+                    <img height="100px" alt="Book cover" ng-src="{{book.cover.meta}}{{book.cover.data}}" />
                 </div>
                 <div style="clear:both">
                 </div>
@@ -27,12 +26,12 @@
             <fieldset>
                 <div style="margin-left:100px">
                     <div style="float:right;width:100%;">
-                        Title: {{bookCtrl.book.title}}
+                        Title: {{bookCtrl.book.title}}<br />
                         Author: {{bookCtrl.book.author}}<br />
                         ISBN: {{bookCtrl.book.isbn}}<br />
                     </div>
                     <div style="float:left;width:100px;margin-left:-100px;">
-                        <img height="100" alt="star" ng-src="{{bookCtrl.book.cover.meta}}{{bookCtrl.book.cover.data}}" />
+                        <img height="100" alt="Book cover" ng-src="{{bookCtrl.book.cover.meta}}{{bookCtrl.book.cover.data}}" />
                     </div>
                     <div style="clear:both">
                     </div>
@@ -48,7 +47,7 @@
                 </div>
                 <div class="form-group">
                     <label for="bookCover">Cover</label>
-                    <input type="file" accept="image/*" name="bookCover" id="bookCover" class="form-control" />
+                    <input type="file" accept="image/*" name="bookCover" id="bookCover" onchange="angular.element(this).scope().handleFileSelect(event)" class="form-control" />
                 </div>
                 <div class="form-group">
                     <label for="bookDate">Date added:</label>
