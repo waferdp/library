@@ -23,7 +23,7 @@ libraryApp.controller('libraryController', ['$http', function ($http) {
 
 var handleFileSelect
 
-libraryApp.controller('bookController', ['$http', function ($http) {
+libraryApp.controller('bookController', ['$http', '$scope', function ($http, $scope) {
     this.book = {};
     this.book.cover = {};
     var bookControl = this;
@@ -50,6 +50,7 @@ libraryApp.controller('bookController', ['$http', function ($http) {
                 var imageBase64Enc = btoa(readerEvent.target.result);
                 bookControl.book.cover.meta = "data:" + file.type + ";base64,";
                 bookControl.book.cover.data = imageBase64Enc;
+                $scope.$apply();
             };
 
             reader.readAsBinaryString(file);
