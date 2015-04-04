@@ -1,8 +1,6 @@
 ﻿var libraryApp = angular.module('library-ui', []);
-var bookCoverData;
-var bookCoverMetaData;
 
-libraryApp.controller('libraryController', ['$http', function ($http) {
+libraryApp.controller('libraryController', ['$http', '$scope', function ($http, $scope) {
 
     var library = this;
     library.books = [];
@@ -18,10 +16,12 @@ libraryApp.controller('libraryController', ['$http', function ($http) {
         });
     }
 
+    this.editBook = function (book) {
+        $scope.$broadcast('editBook', book);
+    }
+
 
 }]);
-
-var handleFileSelect
 
 libraryApp.controller('bookController', ['$http', '$scope', function ($http, $scope) {
     this.book = {};
@@ -29,19 +29,42 @@ libraryApp.controller('bookController', ['$http', '$scope', function ($http, $sc
     var bookControl = this;
     var bookCoverChooser;
 
-    this.addBook = function (library) {
-        var bookString = JSON.stringify(this.book);
-        var postBook = this.book;
-        $http.post('api/library', bookString).success(function (data) {
-            postBook._id = data;
-            library.books.push(postBook);
-            bookControl.book = {};
-            bookControl.book.cover = {};
-            bookCoverChooser.value = '';
-           
-            document.getElementById('bookCoverPreview').src = '';
-        });
+    this.bookWriteCallBack = function (data) {
+        postBook._id = data;
+        library.books.push(postBook);
+        bookControl.book = {};
+        bookControl.book.cover = {};
+        bookCoverChooser.value = '';
+
+        document.getElementById('bookCoverPreview').src = '';
     };
+
+    this.addBook = function (library) {
+        var postBook = this.book;
+        var bookString;
+        if (this.book._id)
+        {
+            var bookId = this.book._id;
+
+            delete this.book._id;
+            delete this.book.$$hashKey;
+            delete this.book.__v;
+            bookString = JSON.stringify(this.book);
+            $http.put('api/library/' + bookId, bookString).success(bookWriteCallBack);
+        }
+        else
+        {
+            bookString = JSON.stringify(this.book);
+            $http.post('api/library', bookString).success(bookWriteCallBack);
+        }
+    };
+    
+    this.editReset = function () {
+        this.book = {};
+        this.book.cover = {};
+        document.getElementById('bookCoverPreview').src = '';
+    };
+
 
     $scope.handleFileSelect = function (event) {
         var files = event.target.files;
@@ -59,5 +82,14 @@ libraryApp.controller('bookController', ['$http', '$scope', function ($http, $sc
             reader.readAsBinaryString(file);
         }
     };
+
+    $scope.$on('editBook', function(event, data) {
+        data.date = new Date(data.date);
+        bookControl.book = data;
+        if(!data.cover)
+        {
+            data.cover = {};
+        }
+    });
 
 }]);

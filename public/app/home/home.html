@@ -9,13 +9,14 @@
             <div style="margin-left:100px">
                 <div style="float:right;width:100%;">
                     <strong>Title:</strong> {{book.title}}
-                    <button style="position:absolute; left:400px;" ng-click="library.removeBook(book)">-</button><br />
+                    <i class="fa fa-pencil" style="position:absolute; left:400px;cursor: pointer;" ng-click="library.editBook(book)"></i>
+                    <i class="fa fa-times" style="position:absolute; left:420px;cursor: pointer;" ng-click="library.removeBook(book)"></i><br />
                     <strong>Author:</strong> {{book.author}}<br />
                     <strong>ISBN:</strong> {{book.isbn}}<br />
-                    {{book.date | date}}<br />
+                    <strong>Date Added:</strong> {{book.date | date}}<br />
                 </div>
                 <div style="float:left;width:100px;margin-left:-100px;">
-                    <img height="100px" alt="Book cover" ng-src="{{book.cover.meta}}{{book.cover.data}}" />
+                    <img height="100" alt="Book cover" ng-src="{{book.cover.meta}}{{book.cover.data}}" />
                 </div>
                 <div style="clear:both">
                 </div>
@@ -30,7 +31,7 @@
                         <strong>Title:</strong> {{bookCtrl.book.title}}<br />
                         <strong>Author:</strong> {{bookCtrl.book.author}}<br />
                         <strong>ISBN:</strong> {{bookCtrl.book.isbn}}<br />
-                        <strong>Date Added:</strong> {{bookCtrl.book.date}}<br />
+                        <strong>Date Added:</strong> {{bookCtrl.book.date | date}}<br />
                     </div>
                     <div style="float:left;width:100px;margin-left:-110px;">
                         <img style="height:100px;" height="100" name="bookCoverPreview" id="bookCoverPreview" alt="Please select book cover" ng-src="{{bookCtrl.book.cover.meta}}{{bookCtrl.book.cover.data}}" />
@@ -60,6 +61,7 @@
                     <input type="text" name="bookISBN" id="bookISBN" class="form-control" ng-model="bookCtrl.book.isbn" />
                 </div>
                 <input type="submit" name="bookSubmit" id="bookSubmit" class="btn btn-default" value="Submit" />
+                <input type="reset" name="bookReset" id="bookReset" class="btn btn-default" ng-click="bookCtrl.editReset()" value="Cancel" ng-show="bookCtrl.book._id" />
             </fieldset>
         </form>
     </div>

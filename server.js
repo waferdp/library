@@ -30,17 +30,32 @@ var BookModel = mongoose.model('book', BookSchema);
 app.get('/api/library', function(req, res) {
     if(db != null)
     {
-	BookModel.find(function(err, books) {
+	    BookModel.find(function(err, books) {
 	    if(!err) {
-		res.send(JSON.stringify(books));
+		    res.send(JSON.stringify(books));
 	    }
 	    else {
-		console.log("Error listing books: " + err);
+		    console.log("Error listing books: " + err);
 	    }
 	});
 
    }	
 });
+
+app.get('/api/library/:id', function (req, res) {
+    if (db != null) {
+        BookModel.findById(req.params.id,function (err, book) {
+            if (!err) {
+                res.send(JSON.stringify(book));
+            }
+            else {
+                console.log("Error retrieving book " + req.params.id + ": " + err);
+            }
+        });
+
+    }
+});
+
 
 app.post('/api/library', function(req,res) {
 
@@ -57,24 +72,36 @@ app.post('/api/library', function(req,res) {
     });
 });
 
+app.put('/api/library/:id', function (req, res) {
+    BookModel.findByIdAndUpdate(req.params.id, req.body, function (err, post) {
+        if (err) {
+            console.log("Error when updating book: " + req.body._id + ": " + err);
+        }
+        else {
+            res.send(req.params.id);
+        }
+        
+    });
+});
+
 app.delete('/api/library/:id', function(req,res){
 
     if(db != null)
     {
-	BookModel.findById(req.params.id, function(err, book) {
-	    if(!err) {
-		book.remove(function(err) {
-		    if(err) {
-			console.log("Error when removing book " + book.title + ": " + err);
-		    }
-		});
-	    }
-	    else {
-		console.log("Error finding book " + req.params.id + ": " + err);
-	    }
-	});
+        BookModel.findById(req.params.id, function(err, book) {
+            if(!err) {
+                book.remove(function(err) {
+                    if(err) {
+                        console.log("Error when removing book " + book.title + ": " + err);
+                    }
+                });
+            }
+            else {
+                console.log("Error finding book " + req.params.id + ": " + err);
+            }
+        });
     }
 });
 
-app.listen(8000);	
-console.log('Library server listening on port 8000'); 
+    app.listen(8000);	
+    console.log('Library server listening on port 8000'); 
