@@ -29,32 +29,31 @@ libraryApp.controller('bookController', ['$http', '$scope', function ($http, $sc
     var bookControl = this;
     var bookCoverChooser;
 
-    this.bookWriteCallBack = function (data) {
-        postBook._id = data;
-        library.books.push(postBook);
-        bookControl.book = {};
-        bookControl.book.cover = {};
-        bookCoverChooser.value = '';
-
-        document.getElementById('bookCoverPreview').src = '';
-    };
-
     this.addBook = function (library) {
         var postBook = this.book;
-        var bookString;
+
+        function bookWriteCallBack(data) {
+            postBook._id = data;
+            library.books.push(postBook);
+            bookControl.book = {};
+            bookControl.book.cover = {};
+            bookCoverChooser.value = '';
+
+            document.getElementById('bookCoverPreview').src = '';
+        };
+
         if (this.book._id)
         {
             var bookId = this.book._id;
-
             delete this.book._id;
             delete this.book.$$hashKey;
             delete this.book.__v;
-            bookString = JSON.stringify(this.book);
+            var bookString = JSON.stringify(this.book);
             $http.put('api/library/' + bookId, bookString).success(bookWriteCallBack);
         }
         else
         {
-            bookString = JSON.stringify(this.book);
+            var bookString = JSON.stringify(this.book);
             $http.post('api/library', bookString).success(bookWriteCallBack);
         }
     };
@@ -65,6 +64,9 @@ libraryApp.controller('bookController', ['$http', '$scope', function ($http, $sc
         document.getElementById('bookCoverPreview').src = '';
     };
 
+    $scope.bookWriteCallBack = function (data) {
+
+    }
 
     $scope.handleFileSelect = function (event) {
         var files = event.target.files;
