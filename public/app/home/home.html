@@ -8,10 +8,11 @@
         <li class="list-group-item" ng-repeat="book in library.books">
             <div style="margin-left:100px">
                 <div style="float:right;width:100%;">
-                    Title: {{book.title}}
+                    <strong>Title:</strong> {{book.title}}
                     <button style="position:absolute; left:400px;" ng-click="library.removeBook(book)">-</button><br />
-                    Author: {{book.author}}<br />
-                    ISBN: {{book.isbn}}<br />
+                    <strong>Author:</strong> {{book.author}}<br />
+                    <strong>ISBN:</strong> {{book.isbn}}<br />
+                    {{book.date | date}}<br />
                 </div>
                 <div style="float:left;width:100px;margin-left:-100px;">
                     <img height="100px" alt="Book cover" ng-src="{{book.cover.meta}}{{book.cover.data}}" />
@@ -24,14 +25,15 @@
     <div id="bookFormContainer" style="width:50%; border: solid; padding:20px;">
         <form name="bookForm" ng-controller="bookController as bookCtrl" ng-submit="bookForm.$valid && bookCtrl.addBook(library)">
             <fieldset>
-                <div style="margin-left:100px">
+                <div style="margin-left:110px">
                     <div style="float:right;width:100%;">
-                        Title: {{bookCtrl.book.title}}<br />
-                        Author: {{bookCtrl.book.author}}<br />
-                        ISBN: {{bookCtrl.book.isbn}}<br />
+                        <strong>Title:</strong> {{bookCtrl.book.title}}<br />
+                        <strong>Author:</strong> {{bookCtrl.book.author}}<br />
+                        <strong>ISBN:</strong> {{bookCtrl.book.isbn}}<br />
+                        <strong>Date Added:</strong> {{bookCtrl.book.date}}<br />
                     </div>
-                    <div style="float:left;width:100px;margin-left:-100px;">
-                        <img height="100" alt="Book cover" ng-src="{{bookCtrl.book.cover.meta}}{{bookCtrl.book.cover.data}}" />
+                    <div style="float:left;width:100px;margin-left:-110px;">
+                        <img style="height:100px;" height="100" name="bookCoverPreview" id="bookCoverPreview" alt="Please select book cover" ng-src="{{bookCtrl.book.cover.meta}}{{bookCtrl.book.cover.data}}" />
                     </div>
                     <div style="clear:both">
                     </div>
