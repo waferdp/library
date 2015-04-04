@@ -54,7 +54,6 @@ libraryApp.controller('bookController', ['$http', '$scope', function ($http, $sc
                 bookControl.book.cover.meta = "data:" + file.type + ";base64,";
                 bookControl.book.cover.data = imageBase64Enc;
                 $scope.$apply();
-                //document.getElementById('bookCoverPreview').src = bookControl.book.cover.meta + bookControl.book.cover.data;
             };
 
             reader.readAsBinaryString(file);
