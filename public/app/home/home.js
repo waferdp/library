@@ -27,23 +27,26 @@ libraryApp.controller('bookController', ['$http', '$scope', function ($http, $sc
     this.book = {};
     this.book.cover = {};
     var bookControl = this;
+    var bookCoverChooser;
 
     this.addBook = function (library) {
-        //this.book.cover = {};
-        //this.book.cover.meta = bookCoverMetaData;
-        //this.book.cover.data = bookCoverData;
         var bookString = JSON.stringify(this.book);
         var postBook = this.book;
         $http.post('api/library', bookString).success(function (data) {
             postBook._id = data;
             library.books.push(postBook);
             bookControl.book = {};
+            bookControl.book.cover = {};
+            bookCoverChooser.value = '';
+           
+            document.getElementById('bookCoverPreview').src = '';
         });
     };
 
     $scope.handleFileSelect = function (event) {
         var files = event.target.files;
         var file = files[0];
+        bookCoverChooser = event.target;
         if (files && file) {
             var reader = new FileReader();
             reader.onload = function (readerEvent) {
@@ -51,6 +54,7 @@ libraryApp.controller('bookController', ['$http', '$scope', function ($http, $sc
                 bookControl.book.cover.meta = "data:" + file.type + ";base64,";
                 bookControl.book.cover.data = imageBase64Enc;
                 $scope.$apply();
+                //document.getElementById('bookCoverPreview').src = bookControl.book.cover.meta + bookControl.book.cover.data;
             };
 
             reader.readAsBinaryString(file);
