@@ -37,9 +37,10 @@ libraryApp.controller('bookController', ['$http', '$scope', function ($http, $sc
             library.books.push(postBook);
             bookControl.book = {};
             bookControl.book.cover = {};
-            bookCoverChooser.value = '';
-
-            document.getElementById('bookCoverPreview').src = '';
+            if (bookCoverChooser) {
+                bookCoverChooser.value = '';
+            }
+            bookForm.bookCoverPreview.src = '';
         };
 
         if (this.book._id)
@@ -61,12 +62,8 @@ libraryApp.controller('bookController', ['$http', '$scope', function ($http, $sc
     this.editReset = function () {
         this.book = {};
         this.book.cover = {};
-        document.getElementById('bookCoverPreview').src = '';
+        bookForm.bookCoverPreview.src = '';
     };
-
-    $scope.bookWriteCallBack = function (data) {
-
-    }
 
     $scope.handleFileSelect = function (event) {
         var files = event.target.files;
@@ -88,6 +85,7 @@ libraryApp.controller('bookController', ['$http', '$scope', function ($http, $sc
     $scope.$on('editBook', function(event, data) {
         data.date = new Date(data.date);
         bookControl.book = data;
+        bookCoverChooser.value = '';
         if(!data.cover)
         {
             data.cover = {};

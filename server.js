@@ -2,106 +2,24 @@ var express        = require('express');
 var morgan         = require('morgan');
 var bodyParser     = require('body-parser');
 var methodOverride = require('method-override');
-var mongoose       = require('mongoose');
-var app            = express();
+var passport = require('passport');
+var flash = require('connect-flash');
+
+var app = express();
+var expressSession = require('express-session');
 
 app.use(express.static(__dirname + '/public')); 	// set the static files location /public/img will be /img for users
 app.use(morgan('dev')); 					// log every request to the console
 app.use(bodyParser()); 						// pull information from html in POST
 app.use(methodOverride()); 					// simulate DELETE and PUT
+app.use(flash());
+app.use(expressSession({ secret: 'hamSandwich' }));
+app.use(passport.initialize());
+app.use(passport.session());
 
 
-mongoose.connect("mongodb://192.168.1.18/library");
-var db = mongoose.connection;
 
+require('./routes.js')(app, passport);
 
-var BookSchema = new mongoose.Schema({  
-    title: { type: String, required: true },
-    author: { type: String, required: true},
-    isbn: String,
-    cover: { meta: String, data: String},
-    date: Date 
-},{
-    collection: 'books'
-});
-
-var BookModel = mongoose.model('book', BookSchema);
-
-app.get('/api/library', function(req, res) {
-    if(db != null)
-    {
-	    BookModel.find(function(err, books) {
-	    if(!err) {
-		    res.send(JSON.stringify(books));
-	    }
-	    else {
-		    console.log("Error listing books: " + err);
-	    }
-	});
-
-   }	
-});
-
-app.get('/api/library/:id', function (req, res) {
-    if (db != null) {
-        BookModel.findById(req.params.id,function (err, book) {
-            if (!err) {
-                res.send(JSON.stringify(book));
-            }
-            else {
-                console.log("Error retrieving book " + req.params.id + ": " + err);
-            }
-        });
-
-    }
-});
-
-
-app.post('/api/library', function(req,res) {
-
-    var book = new BookModel(req.body);
-    book.save(function(err){
-	if(err)
-	{
-	    console.log("Error creating book: " + err);
-	}
-	else
-	{
-	    res.send(book._id);
-	}
-    });
-});
-
-app.put('/api/library/:id', function (req, res) {
-    BookModel.findByIdAndUpdate(req.params.id, req.body, function (err, post) {
-        if (err) {
-            console.log("Error when updating book: " + req.body._id + ": " + err);
-        }
-        else {
-            res.send(req.params.id);
-        }
-        
-    });
-});
-
-app.delete('/api/library/:id', function(req,res){
-
-    if(db != null)
-    {
-        BookModel.findById(req.params.id, function(err, book) {
-            if(!err) {
-                book.remove(function(err) {
-                    if(err) {
-                        console.log("Error when removing book " + book.title + ": " + err);
-                    }
-                });
-            }
-            else {
-                console.log("Error finding book " + req.params.id + ": " + err);
-            }
-        });
-    }
-});
-
-    app.listen(8000);	
-    console.log('Library server listening on port 8000'); 
+app.listen(8000);	
+console.log('Library server listening on port 8000'); 
