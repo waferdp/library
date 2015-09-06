@@ -12,8 +12,9 @@
     "passport": "latest",
     "passport-local": "latest",
     "express-session": "latest",
-    "connect-flash" : "~0.1.1",     
-    "bcrypt-nodejs" : "latest"
+    "connect-flash" : "~0.1.1",
+    "bcrypt-nodejs": "latest",
+    "btoa": "latest"
   },
   "devDependencies": {},
   "scripts": {

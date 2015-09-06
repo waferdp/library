@@ -1,6 +1,7 @@
 ﻿var LocalStrategy = require('passport-local').Strategy;
 var mongoose = require('mongoose');
 var bCrypt = require('bcrypt-nodejs');
+var btoa = require('btoa');
 
 
 var libraryConnection = mongoose.createConnection("mongodb://192.168.1.18/library");
@@ -16,88 +17,91 @@ module.exports = function (app, passport) {
         return bCrypt.compareSync(password, user.password);
     }
 
-    passport.serializeUser(function (user, done) {
-        done(null, user._id);
-    });
+    app.post('/login', function (req, res) {
+        console.log(JSON.stringify(req.body));
 
-    passport.deserializeUser(function (id, done) {
-        User.findById(id, function (err, user) {
-            done(err, user);
+        var username = req.body.username;
+        var password = req.body.password;
+
+
+        app.login(username, password).then(function (user) {
+            res.status(200);
+            res.send(user);
+        }, function (error) {
+            res.status(403);
+            res.send('Bad username/password;');
         });
     });
 
-    passport.use('login', new LocalStrategy({ passReqToCallback: true }, function (req, username, password, done) {
-        User.findOne({ username: username },
-            function (err, user) {
-                if (err) {
-                    console.error('Error finding user');
-                    return done(err, false, { message: 'Error searching for user.' });
-                }
-                if (!user) {
-                    return done(null, false, { message: 'Incorrect username.' });
-                }
-                if (!validPassword(user, password)) {
-                    return done(null, false, { message: 'Incorrect password.' });
-                }
-                console.log("login successful for user: " + user.username)
-                return done(null, user);
+    app.login = function (username, password) {
+        
+        return new Promise(function (resolve, reject) {
+            User.findOne({ username: username },
+                function (err, user) {
+                    if (err) {
+                        console.error('Error finding user');
+                        reject(err);;
+                    }
+                    if (!user) {
+                        console.log('No user found');
+                        reject('Could not match user/password');
+                    }
+                    if (!validPassword(user, password)) {
+                        console.log('Bad password for user', user)
+                        reject('Could not match user/password');
+                    }
+                    console.log("login successful for user: " + user.username)
+                    resolve(user);
             });
-    }));
+        })
+    }
 
-    app.post('/login', passport.authenticate('login', {
-        successRedirect: '/#/',
-        failureFlash: true
-    }));
+    app.post('/signup', function (req, res) {
 
-
-    app.post('/signup', passport.authenticate('signup', {
-        successRedirect: '/#',
-        failureFlash: true
-    }));
+        var username = req.body.username;
+        var password = req.body.password;
+        var email = req.body.email || "";
+        // find a user in Mongo with provided username
+        console.log("User registration: " + req.body.username + ":" + req.body.password);
 
 
-    passport.use('signup', new LocalStrategy({ passReqToCallback: true }, function (req, username, password, done) {
-        findOrCreateUser = function () {
-            // find a user in Mongo with provided username
-            console.log(username);
-            User.findOne({ 'username': username }, function (err, user) {
-                // In case of any error return
-                if (err) {
-                    console.log('Error in SignUp: ' + err);
-                    return done(err);
-                }
-                // already exists
-                if (user) {
-                    console.log('User already exists');
-                    return done(null, false, req.flash('message', 'User Already Exists'));
-                } else {
-                    // if there is no user with that email
-                    // create the user
-                    var newUser = new User();
-                    // set the user's local credentials
-                    newUser.username = username;
-                    newUser.password = createHash(password);
-                    newUser.token = createHash(new Date().getTime());
-                    newUser.email = req.params('email');
+        User.findOne({ 'username': username }, function (err, user) {
+            // In case of any error return
+            if (err) {
+                console.log('Error in SignUp: ' + err);
+                res.status(500);
+                res.send('Error creating user: ' + error.message);
+            }
+            // already exists
+            if (user) {
+                console.log('User already exists');
+                res.status(500);
+                res.send('Error creating user: ' + error.message);
+            } else {
+                // if there is no user with that email
+                // create the user
+                var newUser = new User();
+                // set the user's local credentials
+                newUser.username = username;
+                newUser.password = createHash(password);
+                newUser.token = btoa(createHash(new Date().getTime()));
+                newUser.email = email;
 
-                    // save the user
-                    newUser.save(function (err) {
-                        if (err) {
-                            console.log('Error in Saving user: ' + err);
-                            throw err;
-                        }
-                        console.log('User Registration succesful');
-                        return done(null, newUser);
-                    });
-                }
-            });
-        };
+                // save the user
+                newUser.save(function (err) {
+                    if (err) {
+                        console.log('Error in Saving user: ' + err);
+                        throw err;
+                    }
+                    console.log('User Registration succesful');
+                    res.send(newUser);
+                });
+            }
+        });
 
-        // Delay the execution of findOrCreateUser and execute 
-        // the method in the next tick of the event loop
-        process.nextTick(findOrCreateUser);
-    })
-    );
+    });
+
+    
 
     // Generates hash using bCrypt
     var createHash = function (password) {
@@ -105,7 +109,8 @@ module.exports = function (app, passport) {
     }
 
     app.get('/api/library', function (req, res) {
-        console.log(req.session);
+        var token = req.get("access_token");
+        console.log(token);
         if (libraryConnection != null) {
             BookModel.find(function (err, books) {
                 if (!err) {
@@ -118,10 +123,38 @@ module.exports = function (app, passport) {
         }
     });
 
-    app.get('/loggedin', passport.authenticate('login', {
-        failureRedirect: '/#/auth',
-        failureFlash : true
-    }));
+    app.get('/loggedin/:token', function (req, res) {
+
+        var token = req.params.token;
+        console.log(token);
+        var promise = new Promise(function (resolve, reject) {
+            resolve(app.validateToken(token));
+        })
+
+        promise.then(function (user) {
+            console.log("Succesfully validated token")
+            res.status(204);
+        }, function (error) {
+            console.log("Token invalid")
+            res.status(401);
+        });
+
+    });
+
+    app.validateToken = function (token) {
+        User.findOne({ token: token }, function (err, user) {
+                if (err) {
+                    console.error('Error finding user');
+                    return;
+                }
+                if (!user) {
+                    console.log('No user found');
+                    return;
+                }
+                console.log("token found for user: " + user.username)
+                return user;
+            });
+    }
 
     app.get('/api/library/:id', function (req, res) {
         if (libraryConnection != null) {
