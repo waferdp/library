@@ -4,13 +4,19 @@ libraryApp.controller('libraryController', ['$http', '$scope', function ($http, 
 
     var library = this;
     library.books = [];
+        
+    $scope.config = {};
+    if (window.sessionStorage && window.sessionStorage.getItem('user')) {
+        var user = JSON.parse(window.sessionStorage.getItem('user'));
+        $scope.config = { headers : { 'Authorization': 'Bearer=' + user.token } };
+    }
 
-    $http.get('api/library').success(function (data) {
+    $http.get('api/library', $scope.config).success(function (data) {
         library.books = data;
     });
 
     this.removeBook = function (book) {
-        $http.delete('api/library/' + book._id);
+        $http.delete('api/library/' + book._id, $scope.config);
         library.books = library.books.filter(function (element) {
             return element._id != book._id;
         });
@@ -37,9 +43,10 @@ libraryApp.controller('bookController', ['$http', '$scope', function ($http, $sc
             library.books.push(postBook);
             bookControl.book = {};
             bookControl.book.cover = {};
-            bookCoverChooser.value = '';
-
-            document.getElementById('bookCoverPreview').src = '';
+            if (bookCoverChooser) {
+                bookCoverChooser.value = '';
+            }
+            bookForm.bookCoverPreview.src = '';
         };
 
         if (this.book._id)
@@ -49,24 +56,20 @@ libraryApp.controller('bookController', ['$http', '$scope', function ($http, $sc
             delete this.book.$$hashKey;
             delete this.book.__v;
             var bookString = JSON.stringify(this.book);
-            $http.put('api/library/' + bookId, bookString).success(bookWriteCallBack);
+            $http.put('api/library/' + bookId, bookString, $scope.config).success(bookWriteCallBack);
         }
         else
         {
             var bookString = JSON.stringify(this.book);
-            $http.post('api/library', bookString).success(bookWriteCallBack);
+            $http.post('api/library', bookString, $scope.config).success(bookWriteCallBack);
         }
     };
     
     this.editReset = function () {
         this.book = {};
         this.book.cover = {};
-        document.getElementById('bookCoverPreview').src = '';
+        bookForm.bookCoverPreview.src = '';
     };
-
-    $scope.bookWriteCallBack = function (data) {
-
-    }
 
     $scope.handleFileSelect = function (event) {
         var files = event.target.files;
@@ -88,6 +91,7 @@ libraryApp.controller('bookController', ['$http', '$scope', function ($http, $sc
     $scope.$on('editBook', function(event, data) {
         data.date = new Date(data.date);
         bookControl.book = data;
+        bookCoverChooser.value = '';
         if(!data.cover)
         {
             data.cover = {};
