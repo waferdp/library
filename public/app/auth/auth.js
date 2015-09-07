@@ -5,7 +5,10 @@ loginApp.controller('loginController', ['$http', '$scope', function ($http, $sco
 
     this.login = function () {
         $http.post('login', JSON.stringify(this.user)).success(function (data) {
-            $scope.message = 'Logged in as ' + data.username;
+            $scope.message = "Logged in as " + data.username;
+            if (window.sessionStorage) {
+                window.sessionStorage.setItem('user', JSON.stringify(data));
+            }
         });
     };
 

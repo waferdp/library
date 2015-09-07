@@ -1,5 +1,4 @@
-﻿var LocalStrategy = require('passport-local').Strategy;
-var mongoose = require('mongoose');
+﻿var mongoose = require('mongoose');
 var bCrypt = require('bcrypt-nodejs');
 var btoa = require('btoa');
 
@@ -11,7 +10,7 @@ var User = require('./models/User').UserModel(passPortConnection);
 var BookModel = require('./models/Book').BookModel(libraryConnection);
 
 
-module.exports = function (app, passport) {
+module.exports = function (app) {
 
     var validPassword = function (user, password) {
         return bCrypt.compareSync(password, user.password);
@@ -109,27 +108,56 @@ module.exports = function (app, passport) {
     }
 
     app.get('/api/library', function (req, res) {
-        var token = req.get("access_token");
-        console.log(token);
-        if (libraryConnection != null) {
-            BookModel.find(function (err, books) {
-                if (!err) {
-                    res.send(JSON.stringify(books));
-                }
-                else {
-                    console.log("Error listing books: " + err);
-                }
-            });
-        }
+        
+        var token = getTokenFromRequest(req);
+        
+        var promise = app.tokenValidationPromise(token);
+        promise.then(function (user) {
+            if (libraryConnection != null) {
+                BookModel.find(function (err, books) {
+                    if (!err) {
+                        res.send(JSON.stringify(books));
+                    }
+                    else {
+                        console.log("Error listing books: " + err);
+                    }
+                });
+            }
+        }, function (error) {
+            console.log("Token invalid");
+            res.status(403);            
+            res.send();
+        });
+
     });
+    
+    function getTokenFromRequest(req) {
+        var token = req.get("Authorization") || null;
+        token = trimTokenifBearer(token);
+        return token;
+    }
+
+    function trimTokenifBearer (token) {
+        var bearerTokenType = 'Bearer=';
+        var trimmedToken = token;
+        if(isTokenType(token, bearerTokenType))  {
+            trimmedToken = token.substr(bearerTokenType.length);
+        }
+        return trimmedToken;
+    }
+    
+    function isTokenType(token, tokenType) {
+        if (token && token.substr(0, tokenType.length) == tokenType) {
+            return true;
+        }
+        return false;
+    }
 
     app.get('/loggedin/:token', function (req, res) {
 
         var token = req.params.token;
         console.log(token);
-        var promise = new Promise(function (resolve, reject) {
-            resolve(app.validateToken(token));
-        })
+        var promise = app.tokenValidationPromise(token);
 
         promise.then(function (user) {
             console.log("Succesfully validated token")
@@ -137,81 +165,122 @@ module.exports = function (app, passport) {
         }, function (error) {
             console.log("Token invalid")
             res.status(401);
+            res.send("");
         });
 
     });
 
-    app.validateToken = function (token) {
+    app.validateToken = function (token, resolve, reject) {
         User.findOne({ token: token }, function (err, user) {
                 if (err) {
                     console.error('Error finding user');
-                    return;
+                    reject("Error in database");
                 }
-                if (!user) {
-                    console.log('No user found');
-                    return;
+                else if (!user) {
+                    reject("Bad token");
                 }
+                else {
                 console.log("token found for user: " + user.username)
-                return user;
+                resolve(user);
+                }
             });
+    }
+    
+    app.tokenValidationPromise = function(token) {
+        return new Promise(function (resolve, reject) {
+            app.validateToken(token, resolve, reject);
+        });
     }
 
     app.get('/api/library/:id', function (req, res) {
-        if (libraryConnection != null) {
-            BookModel.findById(req.params.id, function (err, book) {
-                if (!err) {
-                    res.send(JSON.stringify(book));
-                }
-                else {
-                    console.log("Error retrieving book " + req.params.id + ": " + err);
-                }
-            });
+        
+        var token = getTokenFromRequest(req);
+        
+        var promise = app.tokenValidationPromise(token);
+        promise.then(function (user) {
+            if (libraryConnection != null) {
+                BookModel.findById(req.params.id, function (err, book) {
+                    if (!err) {
+                        res.send(JSON.stringify(book));
+                    }
+                    else {
+                        console.log("Error retrieving book " + req.params.id + ": " + err);
+                    }
+                });
 
-        }
+            }
+        }, function (error) {
+            res.status(403);
+            res.send();
+        });
     });
 
 
     app.post('/api/library', function (req, res) {
-
-        var book = new BookModel(req.body);
-        book.save(function (err) {
-            if (err) {
-                console.log("Error creating book: " + err);
-            }
-            else {
-                res.send(book._id);
-            }
+        
+        var token = getTokenFromRequest(req);
+        var promise = app.tokenValidationPromise(token);
+        
+        promise.then(function (user) {
+            var book = new BookModel(req.body);
+            book.save(function (err) {
+                if (err) {
+                    console.log("Error creating book: " + err);
+                }
+                else {
+                    res.send(book._id);
+                }
+            });
+        }, function (error) {
+            res.status(403);
+            res.send();
         });
     });
 
     app.put('/api/library/:id', function (req, res) {
-        BookModel.findByIdAndUpdate(req.params.id, req.body, function (err, post) {
-            if (err) {
-                console.log("Error when updating book: " + req.body._id + ": " + err);
-            }
-            else {
-                res.send(req.params.id);
-            }
+        
+        var token = getTokenFromRequest(req);
+        var promise = app.tokenValidationPromise(token);
+        
+        promise.then(function (user) {
+            BookModel.findByIdAndUpdate(req.params.id, req.body, function (err, post) {
+                if (err) {
+                    console.log("Error when updating book: " + req.body._id + ": " + err);
+                }
+                else {
+                    res.send(req.params.id);
+                }
 
+            });
+        }, function (error) {
+            res.status(403);
+            res.send();
         });
     });
 
     app.delete('/api/library/:id', function (req, res) {
-
-        if (libraryConnection != null) {
-            BookModel.findById(req.params.id, function (err, book) {
-                if (!err) {
-                    book.remove(function (err) {
-                        if (err) {
-                            console.log("Error when removing book " + book.title + ": " + err);
-                        }
-                    });
-                }
-                else {
-                    console.log("Error finding book " + req.params.id + ": " + err);
-                }
-            });
-        }
+        var token = getTokenFromRequest(req);
+        var promise = app.tokenValidationPromise(token);
+        
+        promise.then(function (user) {
+            if (libraryConnection != null) {
+                BookModel.findById(req.params.id, function (err, book) {
+                    if (!err) {
+                        book.remove(function (err) {
+                            if (err) {
+                                console.log("Error when removing book " + book.title + ": " + err);
+                            }
+                        });
+                    }
+                    else {
+                        console.log("Error finding book " + req.params.id + ": " + err);
+                    }
+                });
+            }
+        }, function (error) {
+            res.status(403);
+            res.send();
+        });
     });
 
 };
