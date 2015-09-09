@@ -137,13 +137,11 @@ module.exports = function (app) {
         return token;
     }
 
-    function trimTokenifBearer (token) {
-        var bearerTokenType = 'Bearer=';
-        var trimmedToken = token;
-        if(isTokenType(token, bearerTokenType))  {
-            trimmedToken = token.substr(bearerTokenType.length);
+    function trimTokenifBearer(token) {
+        if (token) {
+            return token.replace('Bearer ', '');
         }
-        return trimmedToken;
+        return token;
     }
     
     function isTokenType(token, tokenType) {
