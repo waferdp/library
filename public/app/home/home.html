@@ -23,46 +23,49 @@
             </div>
         </li>
     </ul>
-    <div id="bookFormContainer" style="width:50%; border: solid; padding:20px;">
-        <form name="bookForm" ng-controller="bookController as bookCtrl" ng-submit="bookForm.$valid && bookCtrl.addBook(library)">
-            <fieldset>
-                <div style="margin-left:110px">
-                    <div style="float:right;width:100%;">
-                        <strong>Title:</strong> {{bookCtrl.book.title}}<br />
-                        <strong>Author:</strong> {{bookCtrl.book.author}}<br />
-                        <strong>ISBN:</strong> {{bookCtrl.book.isbn}}<br />
-                        <strong>Date Added:</strong> {{bookCtrl.book.date | date}}<br />
+
+    <div id="bookFormContainer" class="mainbox col-md-4 col-md-offset-4 col-sm-8 col-sm-offset-2" style="border:solid;">
+        <div style="padding-top:30px" class="panel-body">
+            <form name="bookForm" ng-controller="bookController as bookCtrl" ng-submit="bookForm.$valid && bookCtrl.addBook(library)">
+                <fieldset>
+                    <div style="margin-left:110px">
+                        <div style="float:right;width:100%;">
+                            <strong>Title:</strong> {{bookCtrl.book.title}}<br />
+                            <strong>Author:</strong> {{bookCtrl.book.author}}<br />
+                            <strong>ISBN:</strong> {{bookCtrl.book.isbn}}<br />
+                            <strong>Date Added:</strong> {{bookCtrl.book.date | date}}<br />
+                        </div>
+                        <div style="float:left; width:100px; margin-left:-110px;">
+                            <img style=" height:100px; max-width:85px;" name="bookCoverPreview" id="bookCoverPreview" alt="Please select book cover" ng-src="{{bookCtrl.book.cover.meta}}{{bookCtrl.book.cover.data}}" />
+                        </div>
+                        <div style="clear:both">
+                        </div>
                     </div>
-                    <div style="float:left; width:100px; margin-left:-110px;">
-                        <img style=" min-height:100px; max-width:85px;" name="bookCoverPreview" id="bookCoverPreview" alt="Please select book cover" ng-src="{{bookCtrl.book.cover.meta}}{{bookCtrl.book.cover.data}}" />
+                    <legend>Add a book</legend>
+                    <div class="form-group">
+                        <label for="bookTitle">Title:</label>
+                        <input type="text" name="bookTitle" id="bookTitle" class="form-control" ng-model="bookCtrl.book.title" required />
                     </div>
-                    <div style="clear:both">
+                    <div class="form-group">
+                        <label for="bookAuthor">Author:</label>
+                        <input type="text" name="bookAuthor" id="bookAuthor" class="form-control" ng-model="bookCtrl.book.author" required />
                     </div>
-                </div>
-                <legend>Add a book</legend>
-                <div class="form-group">
-                    <label for="bookTitle">Title:</label>
-                    <input type="text" name="bookTitle" id="bookTitle" class="form-control" ng-model="bookCtrl.book.title" required />
-                </div>
-                <div class="form-group">
-                    <label for="bookAuthor">Author:</label>
-                    <input type="text" name="bookAuthor" id="bookAuthor" class="form-control" ng-model="bookCtrl.book.author" required />
-                </div>
-                <div class="form-group">
-                    <label for="bookCover">Cover</label>
-                    <input type="file" accept="image/*" name="bookCover" id="bookCover" onchange="angular.element(this).scope().handleFileSelect(event)" class="form-control" />
-                </div>
-                <div class="form-group">
-                    <label for="bookDate">Date added:</label>
-                    <input type="date" name="bookDate" id="bookDate" class="form-control" ng-model="bookCtrl.book.date" />
-                </div>
-                <div class="form-group">
-                    <label for="bookISBN">ISBN:</label>
-                    <input type="text" name="bookISBN" id="bookISBN" class="form-control" ng-model="bookCtrl.book.isbn" />
-                </div>
-                <input type="submit" name="bookSubmit" id="bookSubmit" class="btn btn-default" value="Submit" />
-                <input type="reset" name="bookReset" id="bookReset" class="btn btn-default" ng-click="bookCtrl.editReset()" value="Cancel" ng-show="bookCtrl.book._id" />
-            </fieldset>
-        </form>
+                    <div class="form-group">
+                        <label for="bookCover">Cover</label>
+                        <input type="file" accept="image/*" name="bookCover" id="bookCover" onchange="angular.element(this).scope().handleFileSelect(event)" class="form-control" />
+                    </div>
+                    <div class="form-group">
+                        <label for="bookDate">Date added:</label>
+                        <input type="date" name="bookDate" id="bookDate" class="form-control" ng-model="bookCtrl.book.date" />
+                    </div>
+                    <div class="form-group">
+                        <label for="bookISBN">ISBN:</label>
+                        <input type="text" name="bookISBN" id="bookISBN" class="form-control" ng-model="bookCtrl.book.isbn" />
+                    </div>
+                    <input type="submit" name="bookSubmit" id="bookSubmit" class="btn btn-default" value="Submit" />
+                    <input type="reset" name="bookReset" id="bookReset" class="btn btn-default" ng-click="bookCtrl.editReset()" value="Cancel" ng-show="bookCtrl.book._id" />
+                </fieldset>
+            </form>
+        </div>
     </div>
 </div>

@@ -8,7 +8,7 @@ libraryApp.controller('libraryController', ['$http', '$scope', function ($http, 
     $scope.config = {};
     if (window.sessionStorage && window.sessionStorage.getItem('user')) {
         var user = JSON.parse(window.sessionStorage.getItem('user'));
-        $scope.config = { headers : { 'Authorization': 'Bearer=' + user.token } };
+        $scope.config = { headers : { 'Authorization': 'Bearer ' + user.token } };
     }
 
     $http.get('api/library', $scope.config).success(function (data) {
