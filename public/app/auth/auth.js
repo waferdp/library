@@ -4,11 +4,12 @@ loginApp.controller('loginController', ['$http', '$scope', '$location', function
     this.user = {};
 
     this.login = function () {
-        $http.post('login', JSON.stringify(this.user)).then(function (user) {
+        var postPromise = $http.post('login', JSON.stringify(this.user)).then(function (user) {
             $scope.message = "Logged in as " + user.username;
-            storeUser(user);
-            $location.url('/')
+            storeUser(user.data);
+            $location.url('/');
         });
+        return postPromise;
     };
 
     this.signup = function () {
@@ -18,11 +19,11 @@ loginApp.controller('loginController', ['$http', '$scope', '$location', function
         });
     }
 
-        function storeUser(user) {
-            console.log('Storing user');
-            if (window.sessionStorage) {
-                window.sessionStorage.setItem('user', JSON.stringify(user));
-            }
+    function storeUser(user) {
+        console.log('Storing user');
+        if (window.sessionStorage) {
+            window.sessionStorage.setItem('user', JSON.stringify(user));
         }
+    }
     
 }]);

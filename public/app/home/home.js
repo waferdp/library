@@ -25,8 +25,6 @@ libraryApp.controller('libraryController', ['$http', '$scope', function ($http, 
     this.editBook = function (book) {
         $scope.$broadcast('editBook', book);
     }
-
-
 }]);
 
 libraryApp.controller('bookController', ['$http', '$scope', function ($http, $scope) {
@@ -38,8 +36,8 @@ libraryApp.controller('bookController', ['$http', '$scope', function ($http, $sc
     this.addBook = function (library) {
         var postBook = this.book;
 
-        function bookWriteCallBack(data) {
-            postBook._id = data;
+        function bookWriteCallBack(bookIdFromServer) {
+            postBook._id = bookIdFromServer;
             library.books.push(postBook);
             bookControl.book = {};
             bookControl.book.cover = {};
@@ -88,13 +86,13 @@ libraryApp.controller('bookController', ['$http', '$scope', function ($http, $sc
         }
     };
 
-    $scope.$on('editBook', function(event, data) {
-        data.date = new Date(data.date);
-        bookControl.book = data;
+    $scope.$on('editBook', function(event, bookData) {
+        bookData.date = new Date(bookData.date);
+        bookControl.book = bookData;
         bookCoverChooser.value = '';
-        if(!data.cover)
+        if(!bookData.cover)
         {
-            data.cover = {};
+            bookData.cover = {};
         }
     });
 
