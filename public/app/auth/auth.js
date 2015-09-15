@@ -4,7 +4,7 @@ loginApp.controller('loginController', ['$http', '$scope', '$location', function
     this.user = {};
 
     this.login = function () {
-        $http.post('login', JSON.stringify(this.user)).success(function (user) {
+        $http.post('login', JSON.stringify(this.user)).then(function (user) {
             $scope.message = "Logged in as " + user.username;
             storeUser(user);
             $location.url('/')
@@ -12,13 +12,14 @@ loginApp.controller('loginController', ['$http', '$scope', '$location', function
     };
 
     this.signup = function () {
-        $http.post('signup', JSON.stringify(this.user)).success(function(newUser) {
+        $http.post('signup', JSON.stringify(this.user)).then(function(newUser) {
             storeUser(newUser)
             $scope.message = newUser.message;
         });
     }
 
         function storeUser(user) {
+            console.log('Storing user');
             if (window.sessionStorage) {
                 window.sessionStorage.setItem('user', JSON.stringify(user));
             }
