@@ -2,6 +2,7 @@ var express        = require('express');
 var morgan         = require('morgan');
 var bodyParser     = require('body-parser');
 var methodOverride = require('method-override');
+var mongoose = require('mongoose');
 
 var app = express();
 
@@ -10,8 +11,14 @@ app.use(morgan('dev')); 					// log every request to the console
 app.use(bodyParser()); 						// pull information from html in POST
 app.use(methodOverride()); 					// simulate DELETE and PUT
 
-var auth = require('./authorization.js')(app);
-var routes = require('./routes.js')(app);
+var libraryConnection = mongoose.createConnection("mongodb://192.168.1.18/library");
+var Book = require('./models/Book').BookModel(dbConnection);
+
+var passPortConnection = mongoose.createConnection("mongodb://192.168.1.18/passport");
+var User = require('./models/User').UserModel(passPortConnection);
+
+var auth = require('./authorization.js')(app, User);
+var routes = require('./routes.js')(app, Book);
 
 app.listen(8000);	
 console.log('Library server listening on port 8000'); 

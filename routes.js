@@ -1,13 +1,6 @@
-﻿var mongoose = require('mongoose');
-var libraryConnection = mongoose.createConnection("mongodb://192.168.1.18/library");
-var passPortConnection = mongoose.createConnection("mongodb://192.168.1.18/passport");
-
-var User = require('./models/User').UserModel(passPortConnection);
-var BookModel = require('./models/Book').BookModel(libraryConnection);
-
-module.exports = function (app) {
+﻿module.exports = function (app, Book) {
     
-    
+    var BookModel = Book;
     app.post('/login', function (req, res) {
         console.log(JSON.stringify(req.body));
         
@@ -67,7 +60,7 @@ module.exports = function (app) {
         
         var promise = app.tokenValidationPromise(token);
         promise.then(function (user) {
-            if (libraryConnection != null) {
+            if (dbConnection != null) {
                 BookModel.find(function (err, books) {
                     if (!err) {
                         res.send(JSON.stringify(books));
@@ -113,7 +106,7 @@ module.exports = function (app) {
         
         var promise = app.tokenValidationPromise(token);
         promise.then(function (user) {
-            if (libraryConnection != null) {
+            if (dbConnection != null) {
                 BookModel.findById(req.params.id, function (err, book) {
                     if (!err) {
                         res.send(JSON.stringify(book));
@@ -178,7 +171,7 @@ module.exports = function (app) {
         var promise = app.tokenValidationPromise(token);
         
         promise.then(function (user) {
-            if (libraryConnection != null) {
+            if (dbConnection != null) {
                 BookModel.findById(req.params.id, function (err, book) {
                     if (!err) {
                         book.remove(function (err) {

@@ -1,13 +1,10 @@
-﻿var mongoose = require('mongoose');
-var bCrypt = require('bcrypt-nodejs');
+﻿var bCrypt = require('bcrypt-nodejs');
 var btoa = require('btoa');
 
-var passPortConnection = mongoose.createConnection("mongodb://192.168.1.18/passport");
 
-var User = require('./models/User').UserModel(passPortConnection);
-
-module.exports = function (app) {
-
+module.exports = function (app, UserModel) {
+    
+    var User = UserModel;
     var validPassword = function (user, password) {
         return bCrypt.compareSync(password, user.password);
     }
@@ -18,18 +15,14 @@ module.exports = function (app) {
             User.findOne({ username: username },
                 function (err, user) {
                 if (err) {
-                    console.error('Error finding user');
                     reject(err);;
                 }
                 if (!user) {
-                    console.log('No user found');
                     reject('Could not match user/password');
                 }
                 if (!validPassword(user, password)) {
-                    console.log('Bad password for user', user)
                     reject('Could not match user/password');
                 }
-                console.log("login successful for user: " + user.username)
                 resolve(user);
             });
         })
@@ -87,7 +80,6 @@ module.exports = function (app) {
                 reject("Bad token");
             }
             else {
-                console.log("token found for user: " + user.username)
                 resolve(user);
             }
         });
