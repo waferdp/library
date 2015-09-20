@@ -60,16 +60,7 @@
         
         var promise = app.tokenValidationPromise(token);
         promise.then(function (user) {
-            if (dbConnection != null) {
-                BookModel.find(function (err, books) {
-                    if (!err) {
-                        res.send(JSON.stringify(books));
-                    }
-                    else {
-                        console.log("Error listing books: " + err);
-                    }
-                });
-            }
+            res.send(JSON.stringify(app.getLibrary()));
         }, function (error) {
             console.log("Token invalid");
             res.status(403);            
@@ -77,6 +68,20 @@
         });
 
     });
+    
+    app.getLibrary = function () {
+        if (dbConnection != null) {
+            BookModel.find(function (err, books) {
+                if (!err) {
+                    return books;
+                }
+                else {
+                    console.log("Error listing books: " + err);
+                    return {};
+                }
+            });
+        }
+    };
     
     function getTokenFromRequest(req) {
         var token = req.get("Authorization") || null;
@@ -106,23 +111,28 @@
         
         var promise = app.tokenValidationPromise(token);
         promise.then(function (user) {
-            if (dbConnection != null) {
-                BookModel.findById(req.params.id, function (err, book) {
-                    if (!err) {
-                        res.send(JSON.stringify(book));
-                    }
-                    else {
-                        console.log("Error retrieving book " + req.params.id + ": " + err);
-                    }
-                });
-
-            }
+            res.send(JSON.stringify(app.getSpecificBook(req.body.id)));
         }, function (error) {
             res.status(403);
             res.send();
         });
     });
 
+    app.getSpecificBook = function (bookId) {
+        if (dbConnection != null) {
+            BookModel.findById(bookId, function (err, book) {
+                if (!err) {
+                    return book;
+                }
+                else {
+                    console.log("Error retrieving book " + req.params.id + ": " + err);
+                    return {};
+                }
+            });
+
+        }
+    }
+    
 
     app.post('/api/library', function (req, res) {
         
@@ -130,20 +140,26 @@
         var promise = app.tokenValidationPromise(token);
         
         promise.then(function (user) {
-            var book = new BookModel(req.body);
-            book.save(function (err) {
-                if (err) {
-                    console.log("Error creating book: " + err);
-                }
-                else {
-                    res.send(book._id);
-                }
-            });
+            var bookId = app.addBook(req.body);
+            res.send(bookId);
         }, function (error) {
             res.status(403);
             res.send();
         });
     });
+    
+    app.addBook = function (bookData) {
+        var book = new BookModel(bookData);
+        book.save(function (err) {
+            if (err) {
+                console.log("Error creating book: " + err);
+                return '';
+            }
+            else {
+                return bookId;
+            }
+        });
+    }
 
     app.put('/api/library/:id', function (req, res) {
         
@@ -171,24 +187,27 @@
         var promise = app.tokenValidationPromise(token);
         
         promise.then(function (user) {
-            if (dbConnection != null) {
-                BookModel.findById(req.params.id, function (err, book) {
-                    if (!err) {
-                        book.remove(function (err) {
-                            if (err) {
-                                console.log("Error when removing book " + book.title + ": " + err);
-                            }
-                        });
-                    }
-                    else {
-                        console.log("Error finding book " + req.params.id + ": " + err);
-                    }
-                });
-            }
+            app.deleteBook(req.body.id);
         }, function (error) {
             res.status(403);
             res.send();
         });
     });
 
+    app.deleteBook = function (bookId) {
+        if (dbConnection != null) {
+            BookModel.findById(bookId, function (err, book) {
+                if (!err) {
+                    book.remove(function (err) {
+                        if (err) {
+                            console.log("Error when removing book " + book.title + ": " + err);
+                        }
+                    });
+                }
+                else {
+                    console.log("Error finding book " + bookId + ": " + err);
+                }
+            });
+        }
+    }
 };

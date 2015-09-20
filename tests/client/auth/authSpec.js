@@ -13,7 +13,7 @@
         }
     };
 
-    var mockPost = function (postData) { 
+    var mockPost = function (postData) {
         return new Promise(function (resolve, reject) {
             setTimeout(resolve(testUserObject), 500);
         });
@@ -26,16 +26,19 @@
     }));
     
     describe('login', function () {
-        it('logs in to library API', function () {
+        it('logs in to library API', function (done) {
             var $httpMock = { post : mockPost };
-            var controller = $controller('loginController', { $scope: $rootScope, $http: $httpMock, $location : {} });
+            var $locationMock = { url : function (urlAddress) { } };
+            var controller = $controller('loginController', { $scope: $rootScope, $http: $httpMock, $location : $locationMock });
+            console.log("In test");
             controller.user.username = "jacob";
             controller.user.password = "test";
             controller.login().then(function () {
-                //console.log(window.sessionStorage.getItem('user'));
-                //var user = JSON.parse(window.sessionStorage.getItem('user'));
-                //expect(user.username).toEqual('jacob');
-                expect($scope.message).toEqual('Logged in as jacob')
+                var user = JSON.parse(window.sessionStorage.getItem("user"));
+                expect(user.username).toEqual(controller.user.username);
+                done();
+            }, function (error) { 
+                console.error("In error: " + error);
             });
             
         });

@@ -7,7 +7,7 @@ loginApp.controller('loginController', ['$http', '$scope', '$location', function
         var postPromise = $http.post('login', JSON.stringify(this.user)).then(function (user) {
             $scope.message = "Logged in as " + user.username;
             storeUser(user.data);
-            $location.url('/');
+                $location.url('/');
         });
         return postPromise;
     };
