@@ -60,6 +60,8 @@
         
         var promise = app.tokenValidationPromise(token);
         promise.then(function (user) {
+            var bookPromise = app.getLibrary();
+            basicHandling(res, bookPromise);
             res.send(JSON.stringify(app.getLibrary()));
         }, function (error) {
             console.log("Token invalid");
@@ -76,11 +78,11 @@
                     resolve(books);
                 }
                 else {
-                    console.log("Error listing books: " + err);
-                    reject();
+                    reject("Error listing books: " + err);
                 }
             });
         });
+        return bookPromiseva;
     };
     
     function getTokenFromRequest(req) {
@@ -102,7 +104,15 @@
         }
         return false;
     }
-
+    
+    var basicHandling = function (res, promise) {
+        promise.then(function (result) { 
+            res.send(JSON.stringify(result));
+        }, function (error) {
+            res.status(500);
+            res.send(error);
+        });
+    }
 
 
     app.get('/api/library/:id', function (req, res) {
@@ -111,7 +121,8 @@
         
         var promise = app.tokenValidationPromise(token);
         promise.then(function (user) {
-            res.send(JSON.stringify(app.getSpecificBook(req.body.id)));
+            var bookPromise = app.getSpecificBook(req.body.id);
+            app.basicHandling(res, bookPromise);
         }, function (error) {
             res.status(403);
             res.send();
@@ -125,10 +136,11 @@
                     resolve(book);
                 }
                 else {
-                    reject("Error retrieving book " + req.params.id + ": " + err);
+                    reject("Error retrieving book " + bookId + ": " + err);
                 }
             });
         });
+        return bookPromise;
     }
     
 
@@ -138,8 +150,8 @@
         var promise = app.tokenValidationPromise(token);
         
         promise.then(function (user) {
-            var bookId = app.addBook(req.body);
-            res.send(bookId);
+            var bookPromise = app.addBook(req.body);
+            app.basicHandling(res, bookPromise);
         }, function (error) {
             res.status(403);
             res.send();
@@ -147,16 +159,19 @@
     });
     
     app.addBook = function (bookData) {
-        var book = new BookModel(bookData);
-        book.save(function (err) {
-            if (err) {
-                console.log("Error creating book: " + err);
-                return '';
-            }
-            else {
-                return bookId;
-            }
+        var bookPromise = new Promise(function (resolve, reject) {
+            var book = new BookModel(bookData);
+            book.save(function (err) {
+                if (err) {
+                    console.log();
+                    reject("Error creating book: " + err);
+                }
+                else {
+                    resolve(book._id);
+                }
+            });
         });
+        return bookPromise;
     }
 
     app.put('/api/library/:id', function (req, res) {
@@ -165,20 +180,27 @@
         var promise = app.tokenValidationPromise(token);
         
         promise.then(function (user) {
-            BookModel.findByIdAndUpdate(req.params.id, req.body, function (err, post) {
-                if (err) {
-                    console.log("Error when updating book: " + req.body._id + ": " + err);
-                }
-                else {
-                    res.send(req.params.id);
-                }
-
-            });
+            var bookPromise = app.updateBook(req.params.id, req.body);
+            app.basicHandling(res, bookPromise);
         }, function (error) {
             res.status(403);
             res.send();
         });
     });
+    
+    app.updateBook = function(bookId, book) {
+        var bookPromise = new Promise( function(resolve, reject) {
+            BookModel.findByIdAndUpdate(bookId, book, function (err, post) {
+                if (err) {
+                    reject("Error when updating book: " + bookId + ": " + err);
+                }
+                else {
+                    resolve(req.params.id);
+                }
+            });
+        });
+        return bookPromise;
+    };
 
     app.delete('/api/library/:id', function (req, res) {
         var token = getTokenFromRequest(req);
@@ -186,6 +208,8 @@
         
         promise.then(function (user) {
             app.deleteBook(req.body.id);
+            res.status(204);
+            res.send();
         }, function (error) {
             res.status(403);
             res.send();
