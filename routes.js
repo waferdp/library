@@ -63,24 +63,24 @@
             res.send(JSON.stringify(app.getLibrary()));
         }, function (error) {
             console.log("Token invalid");
-            res.status(403);            
+            res.status(403);       
             res.send();
         });
 
     });
     
     app.getLibrary = function () {
-        if (dbConnection != null) {
+        var bookPromise = new Promise(function (resolve, reject) {
             BookModel.find(function (err, books) {
                 if (!err) {
-                    return books;
+                    resolve(books);
                 }
                 else {
                     console.log("Error listing books: " + err);
-                    return {};
+                    reject();
                 }
             });
-        }
+        });
     };
     
     function getTokenFromRequest(req) {
@@ -119,18 +119,16 @@
     });
 
     app.getSpecificBook = function (bookId) {
-        if (dbConnection != null) {
+        var bookPromise = new Promise(function (resolve, reject) {
             BookModel.findById(bookId, function (err, book) {
                 if (!err) {
-                    return book;
+                    resolve(book);
                 }
                 else {
-                    console.log("Error retrieving book " + req.params.id + ": " + err);
-                    return {};
+                    reject("Error retrieving book " + req.params.id + ": " + err);
                 }
             });
-
-        }
+        });
     }
     
 
@@ -195,19 +193,17 @@
     });
 
     app.deleteBook = function (bookId) {
-        if (dbConnection != null) {
-            BookModel.findById(bookId, function (err, book) {
-                if (!err) {
-                    book.remove(function (err) {
-                        if (err) {
-                            console.log("Error when removing book " + book.title + ": " + err);
-                        }
-                    });
-                }
-                else {
-                    console.log("Error finding book " + bookId + ": " + err);
-                }
-            });
-        }
+        BookModel.findById(bookId, function (err, book) {
+            if (!err) {
+                book.remove(function (err) {
+                    if (err) {
+                        console.log("Error when removing book " + book.title + ": " + err);
+                    }
+                });
+            }
+            else {
+                console.log("Error finding book " + bookId + ": " + err);
+            }
+        });
     }
 };
