@@ -21,8 +21,8 @@
             <!--
             <div class="input-group">
                 <div class="checkbox">
-                    <label>
-                        <input id="login-remember" type="checkbox" name="remember" value="1"> Remember me
+                    <label for>
+                        <input id="login-remember" type="checkbox" name="remember" > Remember me
                     </label>
                 </div>
             </div>
@@ -32,8 +32,8 @@
                 <!-- Button -->
 
                 <div class="col-sm-12 controls">
-                    <a id="btn-login" name="loginSubmit" href="#" ng-click="loginForm.$valid && loginCtrl.login()" class="btn btn-success">Login  </a>
-
+                    <a id="btn-login" name="loginSubmit" href="#" ng-click="loginForm.$valid && loginCtrl.login()" ng-hide="loginCtrl.loggedIn()" class="btn btn-success">Login  </a>
+                    <a id="btn-logout" name="logoutSubmit" href="#" ng-click="loginCtrl.logout()" ng-show="loginCtrl.loggedIn()" class="btn btn-default">Logout</a>
                 </div>
             </div>
 
@@ -50,24 +50,5 @@
                 </div>
             </div>
         </form>
-
-        <!--
-        <form name="loginForm" ng-controller="loginController as loginCtrl" ng-submit="loginForm.$valid && loginCtrl.login()">
-            <div class="row">
-                <div class="col-sm-4">
-
-
-                </div>
-            </div>
-            <div class="row">
-                <div class="col-sm-2">
-                    <a href="#" name="signup" class="btn btn-default" ng-click="loginForm.$valid && loginCtrl.signup()"><i class="fa fa-user-plus"></i> Sign up</a>
-                </div>
-                <div class="col-sm-2">
-                    <input type="submit" name="loginSubmit" id="loginSubmit" class="btn btn-default" value="Submit" />
-                </div>
-            </div>
-        </form>
-        -->
     </div>
 </div>

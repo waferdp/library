@@ -40,14 +40,11 @@
     app.get('/loggedin/:token', function (req, res) {
         
         var token = req.params.token;
-        console.log(token);
         var promise = app.tokenValidationPromise(token);
         
         promise.then(function (user) {
-            console.log("Succesfully validated token")
             res.status(204);
         }, function (error) {
-            console.log("Token invalid")
             res.status(401);
             res.send("");
         });
@@ -60,29 +57,31 @@
         
         var promise = app.tokenValidationPromise(token);
         promise.then(function (user) {
-            var bookPromise = app.getLibrary();
-            basicHandling(res, bookPromise);
-            res.send(JSON.stringify(app.getLibrary()));
+            var bookPromise = app.getLibraryAsync();
+            app.basicHandling(res, bookPromise);
         }, function (error) {
-            console.log("Token invalid");
             res.status(403);       
             res.send();
         });
 
     });
     
-    app.getLibrary = function () {
-        var bookPromise = new Promise(function (resolve, reject) {
-            BookModel.find(function (err, books) {
-                if (!err) {
-                    resolve(books);
-                }
-                else {
-                    reject("Error listing books: " + err);
-                }
-            });
+    app.getLibraryAsync = function () {
+        return new Promise(function (resolve, reject) {
+            app.getLibrary(resolve, reject);
         });
-        return bookPromiseva;
+    };
+    
+        
+    app.getLibrary = function (resolve, reject) {
+        BookModel.find(function (err, books) {
+            if (!err) {
+                resolve(books);
+            }
+            else {
+                reject("Error listing books: " + err);
+            }
+        });
     };
     
     function getTokenFromRequest(req) {
@@ -105,8 +104,9 @@
         return false;
     }
     
-    var basicHandling = function (res, promise) {
+    app.basicHandling = function (res, promise) {
         promise.then(function (result) { 
+            res.status(200);
             res.send(JSON.stringify(result));
         }, function (error) {
             res.status(500);
@@ -195,7 +195,7 @@
                     reject("Error when updating book: " + bookId + ": " + err);
                 }
                 else {
-                    resolve(req.params.id);
+                    resolve(bookId);
                 }
             });
         });
