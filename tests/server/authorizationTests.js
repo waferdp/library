@@ -3,41 +3,42 @@ var app = {};
 var assert = require("assert");
 var mongoose = require('mongoose');
 var passPortConnection = mongoose.createConnection("mongodb://192.168.1.18/passport");
-var User = require('../../models/User').UserModel(passPortConnection);
+//svar User = ;
 
-var auth = require("../../authorization.js")(app, User);
-
+var auth = require("../../authorization.js"); //(app, User);
+auth.User = require('../../models/User').UserModel(passPortConnection);
 
 
 describe('Authorization', function () {
     describe('login(username, password)', function () {
         it('should reject with error when user/password is not found', function (done) {
-            
-            var userPromise = app.login('jacob', 'badPassword');
+            var userPromise = auth.login('jacob', 'badPassword');
             userPromise.then(function (user) {
-                assert.equal(user,null)
-                fail();
+                assert.equal(0, 1);
             }, function (error) {
                 done();
             });
         });
 
-        it('should return user when user/password is matches', function (done) {
+        it('should return user when user/password is matches', function (done, fail) {
             
-            var userPromise = app.login('jacob', 'test');
+            var userPromise = auth.login('jacob', 'test');
             userPromise.then(function (user) {
                 //console.log("before assert" + JSON.stringify(user));
                 assert.notEqual(user, null);
                 done();
+            }, function (error) {
+                console.error(error);
+                assert.equal(0, 1);
             });
         });
 
     });
 
-    describe('tokenValidationPromise(token)', function () {
+    describe('tokenValidationAsync(token)', function () {
         it('should reject with error if token is not found', function (done) {
             var token = "123456";
-            var validatePromise = app.tokenValidationPromise(token);
+            var validatePromise = auth.tokenValidationAsync(token);
             validatePromise.then(function (user) { 
                 assert.equal(user, null, "This should not even happen");
             }, function (error) { 
@@ -46,7 +47,7 @@ describe('Authorization', function () {
         });
         it('should return user if token is found', function (done) {
             var token = "JDJhJDEwJGh2NGpUanRWMjZhS0dzVzBKQzBoR2UxL1BkZHAuWnhCRVFxU0pnMDRsN3BOVjFja2czdVgy";
-            var validatePromise = app.tokenValidationPromise(token);
+            var validatePromise = auth.tokenValidationAsync(token);
             validatePromise.then(function (user) {
                 assert.equal(user.token, token);
                 done();
