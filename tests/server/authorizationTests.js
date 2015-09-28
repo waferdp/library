@@ -2,16 +2,19 @@
 var app = {};
 var assert = require("assert");
 var mongoose = require('mongoose');
+//var mockgoose = require('mockgoose');
 var passPortConnection = mongoose.createConnection("mongodb://192.168.1.18/passport");
 //svar User = ;
 
-var auth = require("../../authorization.js"); //(app, User);
-auth.User = require('../../models/User').UserModel(passPortConnection);
+var User = require('../../models/User').UserModel(passPortConnection);
+var auth = require("../../authorization.js")(User); //(app, User);
+
 
 
 describe('Authorization', function () {
     describe('login(username, password)', function () {
         it('should reject with error when user/password is not found', function (done) {
+
             var userPromise = auth.login('jacob', 'badPassword');
             userPromise.then(function (user) {
                 assert.equal(0, 1);
