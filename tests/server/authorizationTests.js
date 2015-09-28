@@ -11,7 +11,7 @@ var auth = require("../../authorization.js")(User); //(app, User);
 
 
 
-describe('Authorization', function () {
+describe('authorization.js', function () {
     describe('login(username, password)', function () {
         it('should reject with error when user/password is not found', function (done) {
 
