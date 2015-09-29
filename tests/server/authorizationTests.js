@@ -2,16 +2,35 @@
 var app = {};
 var assert = require("assert");
 var mongoose = require('mongoose');
-//var mockgoose = require('mockgoose');
-var passPortConnection = mongoose.createConnection("mongodb://192.168.1.18/passport");
-//svar User = ;
+var mockgoose = require('mockgoose');
+mockgoose(mongoose);
 
-var User = require('../../models/User').UserModel(passPortConnection);
+var passPortConnection = mongoose.createConnection("mongodb://192.168.1.18/passport");
+
+var User = require('../../models/User.js').UserModel(passPortConnection);
 var auth = require("../../authorization.js")(User); //(app, User);
 
-
-
 describe('authorization.js', function () {
+
+    beforeEach(function (done) {
+        mockgoose.reset();
+        User.create({
+            _id: mongoose.Types.ObjectId(),
+            email : "",
+            token : "JDJhJDEwJGh2NGpUanRWMjZhS0dzVzBKQzBoR2UxL1BkZHAuWnhCRVFxU0pnMDRsN3BOVjFja2czdVgy",
+            password : "$2a$10$z8xc5abhc.eZXvJ1owS2heO2/XWr9qkWnEBeeTuITNJO9t/Z8v8uO",
+            username : "jacob"
+        }, function (err, model) {
+            done(err);
+        });
+    });
+    
+    afterEach(function (done) {
+        //Reset the database after every test.
+        mockgoose.reset();
+        done();
+    });    
+    
     describe('login(username, password)', function () {
         it('should reject with error when user/password is not found', function (done) {
 
@@ -35,7 +54,19 @@ describe('authorization.js', function () {
                 assert.equal(0, 1);
             });
         });
-
+    });
+    
+    describe('signup(username, password, email)', function () {
+        it('should return an added user if succesful', function (done) {
+            var signupPromise = auth.signup('testUser', 'testPassword', 'noreply@email.com')
+            signupPromise.then(function (user) {
+                assert(user, "New user exists");
+                done();
+            }, function (error) { 
+                console.error(error);
+                assert.equal(0, 1);
+            });
+        });
     });
 
     describe('tokenValidationAsync(token)', function () {

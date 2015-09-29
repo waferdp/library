@@ -57,6 +57,7 @@ module.exports = function (UserModel) {
                 }
             });
         });
+        return signupPromise;
     };
 
     var validateToken = function (token, resolve, reject) {
