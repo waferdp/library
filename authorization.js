@@ -97,6 +97,5 @@ module.exports = function (UserModel) {
         signup : signup,
         tokenValidationAsync : tokenValidationAsync
     };
-
 };
 

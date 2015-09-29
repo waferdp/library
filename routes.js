@@ -1,6 +1,5 @@
 ﻿module.exports = function (app, library, auth) {
     
-
     app.post('/login', function (req, res) {
         console.log(JSON.stringify(req.body));
         
@@ -56,8 +55,8 @@
         
         var promise = auth.tokenValidationAsync(token);
         promise.then(function (user) {
-            var bookPromise = library.getLibraryAsync();
-            app.basicHandling(res, bookPromise);
+            var bookPromise = library.getLibrary();
+            library.basicHandling(res, bookPromise);
         }, function (error) {
             res.status(403);       
             res.send();
@@ -93,7 +92,7 @@
         var promise = auth.tokenValidationAsync(token);
         promise.then(function (user) {
             var bookPromise = library.getSpecificBook(req.body.id);
-            app.basicHandling(res, bookPromise);
+            library.basicHandling(res, bookPromise);
         }, function (error) {
             res.status(403);
             res.send();
@@ -107,7 +106,7 @@
         
         promise.then(function (user) {
             var bookPromise = library.addBook(req.body);
-            app.basicHandling(res, bookPromise);
+            library.basicHandling(res, bookPromise);
         }, function (error) {
             res.status(403);
             res.send();
@@ -121,7 +120,7 @@
         
         promise.then(function (user) {
             var bookPromise = library.updateBook(req.params.id, req.body);
-            app.basicHandling(res, bookPromise);
+            library.basicHandling(res, bookPromise);
         }, function (error) {
             res.status(403);
             res.send();

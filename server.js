@@ -17,8 +17,9 @@ var Book = require('./models/Book').BookModel(libraryConnection);
 var passPortConnection = mongoose.createConnection("mongodb://192.168.1.18/passport");
 var User = require('./models/User').UserModel(passPortConnection);
 
-var auth = require('./authorization.js')(app, User);
-var routes = require('./routes.js')(app, Book);
+var auth = require('./authorization.js')(User);
+var library = require('./library.js')(Book);
+var routes = require('./routes.js')(app, library, auth);
 
 app.listen(8000);	
 console.log('Library server listening on port 8000'); 
