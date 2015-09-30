@@ -74,18 +74,24 @@ module.exports = function (BookModel) {
     };
     
     var deleteBook = function (bookId) {
-        BookModel.findById(bookId, function (err, book) {
-            if (!err) {
-                book.remove(function (err) {
-                    if (err) {
-                        console.log("Error when removing book " + book.title + ": " + err);
-                    }
-                });
-            }
-            else {
-                console.log("Error finding book " + bookId + ": " + err);
-            }
+        var deletePromise = new Promise(function (resolve, reject) {
+            BookModel.findById(bookId, function (err, book) {
+                if (!err) {
+                    book.remove(function (err) {
+                        if (err) {
+                            reject("Error when removing book " + book.title + ": " + err);
+                        }
+                        else {
+                            resolve();
+                        }
+                    });
+                }
+                else {
+                    reject("Error finding book " + bookId + ": " + err);
+                }
+            });
         });
+        return deletePromise;
     };
 
     return {

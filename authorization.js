@@ -51,7 +51,6 @@ module.exports = function (UserModel) {
                             console.log('Error in Saving user: ' + err);
                             throw err;
                         }
-                        console.log('User Registration succesful');
                         resolve(newUser);
                     });
                 }
@@ -60,24 +59,20 @@ module.exports = function (UserModel) {
         return signupPromise;
     };
 
-    var validateToken = function (token, resolve, reject) {
-        User.findOne({ token: token }, function (err, user) {
-            if (err) {
-                console.error('Error finding user');
-                reject("Error in database");
-            }
-            else if (!user) {
-                reject("Bad token");
-            }
-            else {
-                resolve(user);
-            }
-        });
-    };
-
-    var tokenValidationAsync = function (token) {
+    var validateToken = function (token) {
         return new Promise(function (resolve, reject) {
-            validateToken(token, resolve, reject);
+            User.findOne({ token: token }, function (err, user) {
+                if (err) {
+                    console.error('Error finding user');
+                    reject("Error in database");
+                }
+                else if (!user) {
+                    reject("Bad token");
+                }
+                else {
+                    resolve(user);
+                }
+            });
         });
     };
   
@@ -95,7 +90,7 @@ module.exports = function (UserModel) {
     return {
         login : login,
         signup : signup,
-        tokenValidationAsync : tokenValidationAsync
+        validateToken : validateToken
     };
 };
 
