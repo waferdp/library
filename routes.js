@@ -38,7 +38,7 @@
     app.get('/loggedin/:token', function (req, res) {
         
         var token = req.params.token;
-        var promise = auth.tokenValidationAsync(token);
+        var promise = auth.validateToken(token);
         
         promise.then(function (user) {
             res.status(204);
@@ -53,7 +53,7 @@
         
         var token = getTokenFromRequest(req);
         
-        var promise = auth.tokenValidationAsync(token);
+        var promise = auth.validateToken(token);
         promise.then(function (user) {
             var bookPromise = library.getLibrary();
             library.basicHandling(res, bookPromise);
@@ -89,7 +89,7 @@
         
         var token = getTokenFromRequest(req);
         
-        var promise = auth.tokenValidationAsync(token);
+        var promise = auth.validateToken(token);
         promise.then(function (user) {
             var bookPromise = library.getSpecificBook(req.body.id);
             library.basicHandling(res, bookPromise);
@@ -102,7 +102,7 @@
     app.post('/api/library', function (req, res) {
         
         var token = getTokenFromRequest(req);
-        var promise = auth.tokenValidationAsync(token);
+        var promise = auth.validateToken(token);
         
         promise.then(function (user) {
             var bookPromise = library.addBook(req.body);
@@ -116,7 +116,7 @@
     app.put('/api/library/:id', function (req, res) {
         
         var token = getTokenFromRequest(req);
-        var promise = auth.tokenValidationAsync(token);
+        var promise = auth.validateToken(token);
         
         promise.then(function (user) {
             var bookPromise = library.updateBook(req.params.id, req.body);
@@ -129,7 +129,7 @@
 
     app.delete('/api/library/:id', function (req, res) {
         var token = getTokenFromRequest(req);
-        var promise = auth.tokenValidationAsync(token);
+        var promise = auth.validateToken(token);
         
         promise.then(function (user) {
             library.deleteBook(req.body.id);
