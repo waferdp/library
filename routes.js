@@ -40,7 +40,7 @@
         var token = req.params.token;
         var promise = auth.validateToken(token);
         
-        promise.then(function (user) {
+        promise.then(function (token) {
             res.status(204);
         }, function (error) {
             res.status(401);
@@ -54,7 +54,7 @@
         var token = getTokenFromRequest(req);
         
         var promise = auth.validateToken(token);
-        promise.then(function (user) {
+        promise.then(function (token) {
             var bookPromise = library.getLibrary();
             library.basicHandling(res, bookPromise);
         }, function (error) {
@@ -104,7 +104,7 @@
         var token = getTokenFromRequest(req);
         var promise = auth.validateToken(token);
         
-        promise.then(function (user) {
+        promise.then(function (token) {
             var bookPromise = library.addBook(req.body);
             library.basicHandling(res, bookPromise);
         }, function (error) {
@@ -118,7 +118,7 @@
         var token = getTokenFromRequest(req);
         var promise = auth.validateToken(token);
         
-        promise.then(function (user) {
+        promise.then(function (token) {
             var bookPromise = library.updateBook(req.params.id, req.body);
             library.basicHandling(res, bookPromise);
         }, function (error) {
@@ -131,7 +131,7 @@
         var token = getTokenFromRequest(req);
         var promise = auth.validateToken(token);
         
-        promise.then(function (user) {
+        promise.then(function (token) {
             library.deleteBook(req.body.id);
             res.status(204);
             res.send();
