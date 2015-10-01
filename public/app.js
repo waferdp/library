@@ -24,8 +24,12 @@ hostApp.config(function($routeProvider) {
 });
 
 hostApp.controller('mainController', ['$scope','$q', '$http', '$location', function ($scope, $q, $http, $location) {
-        
-    checkLoggedin($q, $http, $location, $scope);
+     
+        checkLoggedin($q, $http, $location).then(function (message) { 
+            $scope.message = message;
+        }, function (error) { 
+            $scope.message = error;
+        });
 }]);
 
 hostApp.controller('aboutController', function($scope) {
@@ -36,41 +40,34 @@ hostApp.controller('authController', ['$scope', function ($scope) {
     $scope.message = 'Log in to api';
 }]);
 
-var checkLoggedin = function($q, $http, $location, $rootScope){ 
+var checkLoggedin = function($q, $http, $location){ 
     // Initialize a new promise 
     var deferred = $q.defer(); 
     // Make an AJAX call to check if the user is logged in 
-    var user = null;
-    if (window.sessionStorage && window.sessionStorage.getItem("user")) {
-        user = JSON.parse(window.sessionStorage.getItem("user"));
+    var token = null;
+    if (window.sessionStorage && window.sessionStorage.getItem("token")) {
+        token = JSON.parse(window.sessionStorage.getItem("token"));
     }
     
-    if (user) {
-        $http.get('/loggedin/' + user.token).success(function (user) {
+    if (token) {
+        $http.get('/loggedin/' + token).success(function (token) {
             // Authenticated 
-            if (user !== '0') {
-                $rootScope.message = 'Welcome to the library, books can be added and removed.';
-                deferred.resolve();
-                console.log("Logged in as " + user.username)
+            if (token) {
+                deferred.resolve('Welcome to the library, books can be added and removed.');
             }
             // Not Authenticated 
             else {
-                $rootScope.message = 'Token no longer valid.';
-                deferred.reject();
-                $location.url('/auth');
+                $location.url('/auth');                
+                deferred.reject('Token no longer valid.');
             }
         }, function (error) {
-            $rootScope.message = 'Error when logging in.';
-            deferred.reject();
             $location.url('/auth')
+            deferred.reject('Error when logging in.');
         }
         );
     } else {
-        $rootScope.message = 'You need to log in.';
-        deferred.reject();
         $location.url('/auth')
-
-        deferred.reject();
+        deferred.reject('You need to log in.');
     }
 
     return deferred.promise; 

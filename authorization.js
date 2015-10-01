@@ -1,10 +1,12 @@
-﻿var bCrypt = require('bcrypt-nodejs');
-var btoa = require('btoa');
+﻿var jws = require('jws');
+var bCrypt = require('bcrypt-nodejs');
 
-module.exports = function (UserModel) { 
+module.exports = function (UserModel, secretKey) { 
 
     var User = UserModel;
+    var _secret = secretKey || '';
     
+
     var login = function (username, password) {
         return new Promise(function (resolve, reject) {
             User.findOne({ username: username },
@@ -19,10 +21,20 @@ module.exports = function (UserModel) {
                 if (!validPassword(user, password)) {
                     reject('Could not match user/password');
                 }
-                resolve(user);
+                resolve(createToken(user.username));
             });
         })
     };
+    
+    var createToken = function (username) {
+        var signature = jws.sign({
+            header: { alg: 'HS256' },
+            payload: username,
+            secret: _secret
+        });
+        return signature;
+    }
+    
 
     var signup = function (username, password, email) {
         var signupPromise = new Promise(function (resolve, reject) {
@@ -33,7 +45,7 @@ module.exports = function (UserModel) {
                     reject('Error creating user: ' + error.message);
                 }
                 // already exists
-                if (user) {
+                if (user) { 
                     reject('User already exists');
                 } else {
                     // if there is no user with that email
@@ -42,7 +54,6 @@ module.exports = function (UserModel) {
                     // set the user's local credentials
                     newUser.username = username;
                     newUser.password = createHash(password);
-                    newUser.token = btoa(createHash(new Date().getTime()));
                     newUser.email = email;
                 
                     // save the user
@@ -51,7 +62,7 @@ module.exports = function (UserModel) {
                             console.log('Error in Saving user: ' + err);
                             throw err;
                         }
-                        resolve(newUser);
+                        resolve(createToken(newUser.username));
                     });
                 }
             });
@@ -61,18 +72,16 @@ module.exports = function (UserModel) {
 
     var validateToken = function (token) {
         return new Promise(function (resolve, reject) {
-            User.findOne({ token: token }, function (err, user) {
-                if (err) {
-                    console.error('Error finding user');
-                    reject("Error in database");
-                }
-                else if (!user) {
-                    reject("Bad token");
-                }
-                else {
-                    resolve(user);
-                }
-            });
+            //var decodedToken = jws.decode(token);
+            //Only allow HS256 to avoid 'none'.
+            var valid = jws.verify(token, 'HS256', secretKey);
+            
+            if (valid) {
+                resolve(token);
+            }
+            else {
+                reject(token);
+            }
         });
     };
   
@@ -90,7 +99,7 @@ module.exports = function (UserModel) {
     return {
         login : login,
         signup : signup,
-        validateToken : validateToken
+        validateToken : validateToken,
     };
 };
 

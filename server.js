@@ -17,7 +17,9 @@ var Book = require('./models/Book').BookModel(libraryConnection);
 var passPortConnection = mongoose.createConnection("mongodb://192.168.1.18/passport");
 var User = require('./models/User').UserModel(passPortConnection);
 
-var auth = require('./authorization.js')(User);
+var secretKey = 'ManBearPig'
+
+var auth = require('./authorization.js')(User, secretKey);
 var library = require('./library.js')(Book);
 var routes = require('./routes.js')(app, library, auth);
 

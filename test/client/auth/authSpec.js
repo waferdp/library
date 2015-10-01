@@ -4,18 +4,11 @@
     var $controller;
     var $rootScope;
     
-    var testUserObject = {
-        data : {
-            username : 'jacob',
-            password : 'unintelligible',
-            token: '123456789ABCDEFGHIJKLMNOPQRTUVWXYZ',
-            email: 'jacob.brannstrom@email.com'
-        }
-    };
+    var token = { data : "eyJhbGciOiJIUzI1NiJ9.amFjb2I.-cLRhkTc_5_sjx9S41P2JIqfDx1_bR0iDjJ4BM8xwvI" };
 
     var mockSuccessPost = function (postData) {
         return new Promise(function (resolve, reject) {
-            setTimeout(resolve(testUserObject), 500);
+            setTimeout(resolve(token), 500);
         });
     };
     
@@ -45,9 +38,9 @@
         it('should set sessionStorage user if successful login', function (done) {
             var controller = setupController(mockSuccessPost);
             controller.login().then(function () {
-                
-                var user = JSON.parse(window.sessionStorage.getItem("user"));
-                expect(user.username).toEqual(controller.user.username);
+                var token = JSON.parse(window.sessionStorage.getItem("token"));
+                var username = atob(token.split(".")[1]);
+                expect(username).toEqual(controller.user.username);
                 done();
             }, function (error) { 
             });
@@ -56,8 +49,8 @@
         it('should not get sessionStorage user if login fails', function (done) {
             var controller = setupController(mockFailPost);
             controller.login().then(function () {
-                var user = JSON.parse(window.sessionStorage.getItem("user"));
-                expect(user).toEqual(null);
+                var token = JSON.parse(window.sessionStorage.getItem("token"));
+                expect(token).toEqual(null);
                 done();
             }, function (error) {
             });
@@ -69,8 +62,8 @@
             var controller = setupController(mockSuccessPost);
             controller.login().then(function () {
                 controller.logout();
-                var user = JSON.parse(window.sessionStorage.getItem("user"));
-                expect(user).toEqual(null);
+                var token = JSON.parse(window.sessionStorage.getItem("token"));
+                expect(token).toEqual(null);
                 done();
             });
         });
