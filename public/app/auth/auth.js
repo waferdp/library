@@ -6,7 +6,7 @@ loginApp.controller('loginController', ['$http', '$scope', '$location', function
         
     this.loggedIn = function () {
         if (window.sessionStorage) {
-            return window.sessionStorage.getItem('user');
+            return window.sessionStorage.getItem('token');
         }
         return false;
     };
@@ -36,18 +36,16 @@ loginApp.controller('loginController', ['$http', '$scope', '$location', function
         });
     };
 
-    function storeToken(user) {
-        this.loggedIn = true;                
+    function storeToken(user) { 
         if (window.sessionStorage) {
             window.sessionStorage.setItem('token', JSON.stringify(user));
         }
     }
 
     function clearToken() {
-        this.loggedIn = false;
         if (window.sessionStorage) {
-            var storedUser = window.sessionStorage.getItem('token');
-            if (storedUser) {
+            var storedToken = window.sessionStorage.getItem('token');
+            if (storedToken) {
                 window.sessionStorage.removeItem('token');
             }
         }
