@@ -19,12 +19,13 @@
     "karma-jasmine": "latest",
     "karma-phantomjs-launcher": "latest",
     "mocha": "^2.3.3",
-    "phantomjs": "latest"
+    "phantomjs": "latest",
+    "mockgoose": "latest"
   },
   "scripts": {
     "test": "npm run test-node && npm run test-browser",
     "start": "node server.js",
-    "test-node": "mocha",
+    "test-node": "mocha test/*.js",
     "test-browser": "karma start karma.config.js"
   },
   "repository": {
