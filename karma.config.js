@@ -18,6 +18,7 @@ module.exports = function(config) {
         'public/scripts/lib/angular.js',
         'public/scripts/lib/angular-route.js',
         'public/scripts/lib/angular-mocks.js',
+        'node_modules/babel-core/browser-polyfill.js',
         'public/**/*.js', 
         'test/**/*Spec.js'
     ],
@@ -59,11 +60,11 @@ module.exports = function(config) {
 
     // start these browsers
     // available browser launchers: https://npmjs.org/browse/keyword/karma-launcher
-    browsers: ['Chrome'],
+    browsers: ['PhantomJS2'],
 
 
     // Continuous Integration mode
     // if true, Karma captures browsers, runs the tests and exits
-    singleRun: false
+    singleRun: true
   })
 }

@@ -13,14 +13,18 @@
     "jws": "latest"
   },
   "devDependencies": {
-    "jasmine-core": "^2.3.4",
-    "karma": "^0.13.9",
-    "karma-chrome-launcher": "^0.2.0",
-    "karma-jasmine": "^0.3.6"
+    "babel-core": "^5.8.25",
+    "jasmine-core": "latest",
+    "karma": "latest",
+    "karma-jasmine": "latest",
+    "karma-phantomjs2-launcher": "latest",
+    "phantomjs2": "latest"
   },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node server.js"
+    "test": "npm run test-node && npm run test-browser",
+    "start": "node server.js",
+    "test-node": "mocha",
+    "test-browser": "karma start karma.config.js"
   },
   "repository": {
     "type": "git",

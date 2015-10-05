@@ -1,6 +1,6 @@
 ﻿var loginApp = angular.module('login-ui', []);
 
-loginApp.controller('loginController', ['$http', '$scope', '$location', function ($http, $scope, $location) {
+loginApp.controller('loginController', ['$http', '$scope', '$location', function ($http, $scope, $location, $q) {
     this.user = {};
         
         
