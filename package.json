@@ -17,8 +17,8 @@
     "jasmine-core": "latest",
     "karma": "latest",
     "karma-jasmine": "latest",
-    "karma-phantomjs2-launcher": "latest",
-    "phantomjs2": "latest"
+    "karma-phantomjs-launcher": "latest",
+    "phantomjs": "latest"
   },
   "scripts": {
     "test": "npm run test-node && npm run test-browser",
