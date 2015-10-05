@@ -18,6 +18,7 @@
     "karma": "latest",
     "karma-jasmine": "latest",
     "karma-phantomjs-launcher": "latest",
+    "mocha": "^2.3.3",
     "phantomjs": "latest"
   },
   "scripts": {
