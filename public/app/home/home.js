@@ -5,18 +5,12 @@ libraryApp.controller('libraryController', ['$http', '$scope', function ($http, 
     var library = this;
     library.books = [];
         
-    $scope.config = {};
-    if (window.sessionStorage && window.sessionStorage.getItem('token')) {
-        var token = JSON.parse(window.sessionStorage.getItem('token'));
-        $scope.config = { headers : { 'Authorization': 'Bearer ' + token } };
-    }
-
-    $http.get('api/library', $scope.config).success(function (data) {
+    $http.get('api/library').success(function (data) {
         library.books = data;
     });
 
     this.removeBook = function (book) {
-        $http.delete('api/library/' + book._id, $scope.config);
+        $http.delete('api/library/' + book._id);
         library.books = library.books.filter(function (element) {
             return element._id != book._id;
         });
@@ -54,12 +48,12 @@ libraryApp.controller('bookController', ['$http', '$scope', function ($http, $sc
             delete this.book.$$hashKey;
             delete this.book.__v;
             var bookString = JSON.stringify(this.book);
-            $http.put('api/library/' + bookId, bookString, $scope.config).success(bookWriteCallBack);
+            $http.put('api/library/' + bookId, bookString).success(bookWriteCallBack);
         }
         else
         {
             var bookString = JSON.stringify(this.book);
-            $http.post('api/library', bookString, $scope.config).success(bookWriteCallBack);
+            $http.post('api/library', bookString).success(bookWriteCallBack);
         }
     };
     
