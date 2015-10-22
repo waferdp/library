@@ -1,5 +1,5 @@
 // create the module and name it hostApp
-var hostApp = angular.module('hostApp', ['ngRoute', 'library-ui', 'login-ui']);
+var hostApp = angular.module('hostApp', ['ngRoute', 'library-ui', 'login-ui','authorization-interceptor']);
 
 hostApp.config(function($routeProvider) {
     $routeProvider
@@ -24,12 +24,7 @@ hostApp.config(function($routeProvider) {
 });
 
 hostApp.controller('mainController', ['$scope','$q', '$http', '$location', function ($scope, $q, $http, $location) {
-     
-        checkLoggedin($q, $http, $location).then(function (message) { 
-            $scope.message = message;
-        }, function (error) { 
-            $scope.message = error;
-        });
+
 }]);
 
 hostApp.controller('aboutController', function($scope) {
