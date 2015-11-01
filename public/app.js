@@ -24,7 +24,8 @@ hostApp.config(function($routeProvider) {
 });
 
 hostApp.controller('mainController', ['$scope','$q', '$http', '$location', function ($scope, $q, $http, $location) {
-
+                
+        checkLoggedin($q, $http, $location);
 }]);
 
 hostApp.controller('aboutController', function($scope) {

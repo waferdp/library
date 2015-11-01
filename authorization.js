@@ -27,11 +27,18 @@ module.exports = function (UserModel, secretKey) {
     };
     
     var createToken = function (username) {
+        var token = {
+            header: { alg: 'HS256' },
+            payload: username,
+            secret: _secret
+        };
+
         var signature = jws.sign({
             header: { alg: 'HS256' },
             payload: username,
             secret: _secret
         });
+        console.log(signature);
         return signature;
     }
     
