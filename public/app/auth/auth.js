@@ -1,15 +1,35 @@
 ﻿var loginApp = angular.module('login-ui', []);
 
-loginApp.controller('loginController', ['$http', '$scope', '$location', function ($http, $scope, $location, $q) {
+loginApp.controller('loginController', ['$http', '$scope', '$location', '$q', function ($http, $scope, $location, $q) {
     this.user = {};
-        
+    var self = this;        
         
     this.loggedIn = function () {
+        return getStoredToken();           
+    };
+        
+    this.submitOnEnter = function ($event, isFormValid) {
+        if (isFormValid && $event.keyCode == 13) {
+            self.login();
+        }
+    }
+
+    this.loggedInUser = function () {
+        var token = getStoredToken();
+        if (token && token.split(".").length == 3) {
+            var payloadEncoded = token.split(".")[1];
+            var payload = atob(payloadEncoded);
+            return payload;
+        }
+        return "";
+    }    
+        
+    var getStoredToken = function () {
         if (window.sessionStorage) {
             return window.sessionStorage.getItem('token');
         }
-        return false;
-    };
+        return null;
+    }    
 
     this.login = function () {
         var postPromise = $http.post('login', JSON.stringify(this.user)).then(function (token) {
@@ -17,7 +37,7 @@ loginApp.controller('loginController', ['$http', '$scope', '$location', function
                 $scope.message = "";
                 storeToken(token.data);
                 $location.url('/');
-            }
+           } 
             else {
                 clearToken();
             }
@@ -50,4 +70,11 @@ loginApp.controller('loginController', ['$http', '$scope', '$location', function
             }
         }
     }
+
+    $scope.$on('$routeChangeSuccess', function (event) {
+        if (loginForm && loginForm.user) {
+            loginForm.username.focus();
+        }
+    });
+
 }]);
