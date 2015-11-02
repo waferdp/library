@@ -8,6 +8,12 @@ loginApp.controller('loginController', ['$http', '$scope', '$location', '$q', fu
         return getStoredToken();           
     };
         
+    this.submitOnEnter = function ($event, isFormValid) {
+        if (isFormValid && $event.keyCode == 13) {
+            self.login();
+        }
+    }
+
     this.loggedInUser = function () {
         var token = getStoredToken();
         if (token && token.split(".").length == 3) {
