@@ -15,13 +15,15 @@ module.exports = function (UserModel, secretKey) {
                     Console.error(err);
                     reject(err);
                 }
-                if (!user) {
+                else if (!user) {
                     reject('Could not match user/password');
                 }
-                if (!validPassword(user, password)) {
+                else if (!validPassword(user, password)) {
                     reject('Could not match user/password');
                 }
-                resolve(createToken(user.username));
+                else {
+                    resolve(createToken(user.username));
+                }
             });
         })
     };
