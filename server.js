@@ -32,14 +32,13 @@ var credentials = {
     passphrase: secretKey
 }
 var httpServer = http.createServer(app);
-//var httpsServer = https.createServer(credentials, app);
+var httpsServer = https.createServer(credentials, app);
 
 
 var auth = require('./authorization.js')(User, secretKey);
 var library = require('./library.js')(Book);
 var routes = require('./routes.js')(app, library, auth);
 
-
 httpServer.listen(8000);
-//httpsServer.listen(44300);
+httpsServer.listen(443);
 console.log('Library server listening on port 8000'); 
