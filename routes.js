@@ -1,6 +1,6 @@
-﻿module.exports = function (app, library, auth) {
+﻿module.exports = function (server, library, auth) {
     
-    app.post('/login', function (req, res) {
+    server.post('/login', function (req, res) {
         console.log(JSON.stringify(req.body));
         
         var username = req.body.username;
@@ -15,7 +15,7 @@
         });
     });
     
-    app.post('/signup', function (req, res) {
+    server.post('/signup', function (req, res) {
         
         var username = req.body.username;
         var password = req.body.password;
@@ -35,7 +35,7 @@
         });
     });
     
-    app.get('/loggedin/:token', function (req, res) {
+    server.get('/loggedin/:token', function (req, res) {
         
         var token = req.params.token;
         var promise = auth.validateToken(token);
@@ -49,7 +49,7 @@
 
     });
 
-    app.get('/api/library', function (req, res) {
+    server.get('/api/library', function (req, res) {
         
         var token = getTokenFromRequest(req);
         
@@ -85,7 +85,7 @@
         return false;
     }
 
-    app.get('/api/library/:id', function (req, res) {
+    server.get('/api/library/:id', function (req, res) {
         
         var token = getTokenFromRequest(req);
         
@@ -99,7 +99,7 @@
         });
     });
 
-    app.post('/api/library', function (req, res) {
+    server.post('/api/library', function (req, res) {
         
         var token = getTokenFromRequest(req);
         var promise = auth.validateToken(token);
@@ -113,7 +113,7 @@
         });
     });
 
-    app.put('/api/library/:id', function (req, res) {
+    server.put('/api/library/:id', function (req, res) {
         
         var token = getTokenFromRequest(req);
         var promise = auth.validateToken(token);
@@ -127,7 +127,7 @@
         });
     });
 
-    app.delete('/api/library/:id', function (req, res) {
+    server.delete('/api/library/:id', function (req, res) {
         var token = getTokenFromRequest(req);
         var promise = auth.validateToken(token);
         
