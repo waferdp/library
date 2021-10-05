@@ -7,7 +7,7 @@
     "body-parser": "^1.12.2",
     "express": "^4.12.3",
     "method-override": "^2.3.2",
-    "mongoose": "^4.0.1",
+    "mongoose": ">=5.7.5",
     "morgan": "^1.5.2",
     "bcrypt-nodejs": "latest",
     "jws": "latest"
@@ -20,7 +20,7 @@
     "karma-phantomjs-launcher": "latest",
     "mocha": "^2.3.3",
     "phantomjs": "latest",
-    "mockgoose": "^1.6.1"
+    "mockgoose": "~1.6.1"
   },
   "scripts": {
     "test": "npm run test-node && npm run test-browser",
