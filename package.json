@@ -20,7 +20,7 @@
     "karma-phantomjs-launcher": "latest",
     "mocha": "^2.3.3",
     "phantomjs": "latest",
-    "mockgoose": "~1.6.1"
+    "mockgoose": "^1.6.1"
   },
   "scripts": {
     "test": "npm run test-node && npm run test-browser",
